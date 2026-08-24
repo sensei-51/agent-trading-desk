@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="924" viewBox="0 0 1240 924" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<defs><marker id="a-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9Z" fill="#8C959F"/></marker><marker id="a-slt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9Z" fill="#3D4C63"/></marker><marker id="a-amb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9Z" fill="#9A6100"/></marker><marker id="a-pur" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9Z" fill="#5B4BC4"/></marker><marker id="a-ros" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9Z" fill="#B32448"/></marker><marker id="a-tea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9Z" fill="#0C6B75"/></marker><marker id="a-grn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9Z" fill="#0E7C4A"/></marker></defs>
+<rect x="0" y="0" width="1240" height="924" fill="#FFFFFF"/>
+<text x="620" y="44" font-size="23" fill="#1F2328" font-weight="600" text-anchor="middle">The three-agent pipeline</text>
+<text x="620" y="68" font-size="13" fill="#57606A" text-anchor="middle">One instruction. Three contexts. Three rule-sets. Exactly one agent is allowed to write.</text>
+<text x="620" y="88" font-size="10.5" fill="#8C959F" text-anchor="middle">/atd-daily  runs every step below in order — and halts rather than working around a failure</text>
+<rect x="56" y="108" width="1128" height="78" rx="12" fill="#EAF6F0" stroke="#A9D8C2" stroke-width="1"/>
+<text x="72" y="129" font-size="9.5" fill="#0E7C4A" font-weight="600" letter-spacing="1.1">1 · INPUT — you own everything here</text>
+<rect x="72" y="132" width="354" height="40" rx="8" fill="#FFFFFF" stroke="#A9D8C2" stroke-width="1"/>
+<text x="86" y="149" font-size="11.5" fill="#0E7C4A" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">input/*.csv</text>
+<text x="86" y="164" font-size="10" fill="#57606A">broker export, dropped in as it comes</text>
+<rect x="443" y="132" width="354" height="40" rx="8" fill="#FFFFFF" stroke="#A9D8C2" stroke-width="1"/>
+<text x="457" y="149" font-size="11.5" fill="#0E7C4A" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">input/watchlist.md</text>
+<text x="457" y="164" font-size="10" fill="#57606A">your candidate registry</text>
+<rect x="814" y="132" width="354" height="40" rx="8" fill="#FFFFFF" stroke="#A9D8C2" stroke-width="1"/>
+<text x="828" y="149" font-size="11.5" fill="#0E7C4A" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">input/tracking/</text>
+<text x="828" y="164" font-size="10" fill="#57606A">discovery names + the sector map</text>
+<line x1="620" y1="186" x2="620.0" y2="200.0" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M620.0 206.0L616.3 200.0L623.7 200.0Z" fill="#8C959F"/>
+<rect x="56" y="206" width="1128" height="136" rx="12" fill="#F0F3F8" stroke="#C6D0E0" stroke-width="1"/>
+<text x="72" y="227" font-size="9.5" fill="#3D4C63" font-weight="600" letter-spacing="1.1">2 · DETERMINISTIC — a script either produces the number or exits non-zero</text>
+<text x="1168" y="227" font-size="11" fill="#3D4C63" font-weight="600" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">python3 tools/run_daily.py</text>
+<rect x="72.0" y="240" width="146.28571428571428" height="52" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
+<text x="145.14285714285714" y="261" font-size="11.5" fill="#3D4C63" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">checks --pre</text>
+<text x="145.14285714285714" y="277" font-size="9.5" fill="#57606A" text-anchor="middle">map hygiene</text>
+<rect x="230.28571428571428" y="240" width="146.28571428571428" height="52" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
+<text x="303.42857142857144" y="261" font-size="11.5" fill="#3D4C63" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">radar</text>
+<text x="303.42857142857144" y="277" font-size="9.5" fill="#57606A" text-anchor="middle">150d · breakout</text>
+<path d="M220.78571428571428 260L225.78571428571428 266L220.78571428571428 272" fill="none" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="388.57142857142856" y="240" width="146.28571428571428" height="52" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
+<text x="461.71428571428567" y="261" font-size="11.5" fill="#3D4C63" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">facts</text>
+<text x="461.71428571428567" y="277" font-size="9.5" fill="#57606A" text-anchor="middle">price · PT · earnings</text>
+<path d="M379.07142857142856 260L384.07142857142856 266L379.07142857142856 272" fill="none" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="546.8571428571429" y="240" width="146.28571428571428" height="52" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
+<text x="620.0" y="261" font-size="11.5" fill="#3D4C63" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">fundamentals</text>
+<text x="620.0" y="277" font-size="9.5" fill="#57606A" text-anchor="middle">score · 6 pillars</text>
+<path d="M537.3571428571429 260L542.3571428571429 266L537.3571428571429 272" fill="none" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="705.1428571428571" y="240" width="146.28571428571428" height="52" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
+<text x="778.2857142857142" y="261" font-size="11.5" fill="#3D4C63" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">flow</text>
+<text x="778.2857142857142" y="277" font-size="9.5" fill="#57606A" text-anchor="middle">overlay, no gate yet</text>
+<path d="M695.6428571428571 260L700.6428571428571 266L695.6428571428571 272" fill="none" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="863.4285714285713" y="240" width="146.28571428571428" height="52" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
+<text x="936.5714285714284" y="261" font-size="11.5" fill="#3D4C63" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">xray</text>
+<text x="936.5714285714284" y="277" font-size="9.5" fill="#57606A" text-anchor="middle">NAV by sector</text>
+<path d="M853.9285714285713 260L858.9285714285713 266L853.9285714285713 272" fill="none" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="1021.7142857142857" y="240" width="146.28571428571428" height="52" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
+<text x="1094.857142857143" y="261" font-size="11.5" fill="#3D4C63" font-weight="600" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">checks --post</text>
+<text x="1094.857142857143" y="277" font-size="9.5" fill="#57606A" text-anchor="middle">bloc cap · honesty</text>
+<path d="M1012.2142857142857 260L1017.2142857142857 266L1012.2142857142857 272" fill="none" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="72" y="315" font-size="10" fill="#57606A">halts on the first non-zero exit · stamps output/.state/run_manifest.json — step exits, artefact sha1s, and the radar verdict the Trader must quote verbatim</text>
+<text x="72" y="331" font-size="9.5" fill="#8C959F" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">produces  radar/latest.md · data/latest.md · data/fundamentals_latest.md · data/flow_latest.md · data/xray_latest.md — the five artefacts the manifest fingerprints</text>
+<line x1="214" y1="342" x2="214.0" y2="380.0" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M214.0 386.0L210.3 380.0L217.7 380.0Z" fill="#8C959F"/>
+<line x1="620" y1="342" x2="620.0" y2="380.0" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="4 4"/>
+<path d="M620.0 386.0L616.3 380.0L623.7 380.0Z" fill="#8C959F"/>
+<text x="630" y="368" font-size="9" fill="#8C959F">radar · x-ray, read directly</text>
+<rect x="56" y="386" width="316" height="262" rx="12" fill="#FFF7EA" stroke="none" stroke-width="1"/>
+<rect x="56" y="386" width="316" height="46" rx="12" fill="#FBEFDA" stroke="none" stroke-width="1"/>
+<rect x="56" y="420" width="316" height="12" rx="0" fill="#FBEFDA" stroke="none" stroke-width="1"/>
+<rect x="56" y="386" width="316" height="262" rx="12" fill="none" stroke="#E8CB9C" stroke-width="1.3"/>
+<text x="214.0" y="413" font-size="15" fill="#9A6100" font-weight="600" text-anchor="middle" letter-spacing="1.4">ANALYST</text>
+<text x="214.0" y="427" font-size="10" fill="#57606A" text-anchor="middle">data ingestion</text>
+<text x="76" y="460" font-size="11" fill="#9A6100">•</text>
+<text x="90" y="460" font-size="11" fill="#1F2328">reads input/config/providers.json</text>
+<text x="76" y="482" font-size="11" fill="#9A6100">•</text>
+<text x="90" y="482" font-size="11" fill="#1F2328">runs facts.py + fundamentals.py</text>
+<text x="76" y="504" font-size="11" fill="#9A6100">•</text>
+<text x="90" y="504" font-size="11" fill="#1F2328">resolves FAIL / PARTIAL rows live</text>
+<text x="76" y="526" font-size="11" fill="#9A6100">•</text>
+<text x="90" y="526" font-size="11" fill="#1F2328">sources the theme news</text>
+<line x1="74" y1="554" x2="354" y2="554" stroke="#E8CB9C" stroke-width="1" stroke-linecap="round"/>
+<text x="76" y="574" font-size="10.5" fill="#9A6100" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ output/data/analyst_&lt;date&gt;.md</text>
+<rect x="146.0" y="588" width="136" height="24" rx="6" fill="#FBE3E8" stroke="none" stroke-width="1"/>
+<text x="214.0" y="604" font-size="10.5" fill="#B32448" font-weight="600" text-anchor="middle">edit: denied</text>
+<text x="214.0" y="632" font-size="9.5" fill="#57606A" text-anchor="middle">reads the source contract, never the rulebooks</text>
+<rect x="462" y="386" width="316" height="262" rx="12" fill="#F2F0FD" stroke="none" stroke-width="1"/>
+<rect x="462" y="386" width="316" height="46" rx="12" fill="#E7E3FA" stroke="none" stroke-width="1"/>
+<rect x="462" y="420" width="316" height="12" rx="0" fill="#E7E3FA" stroke="none" stroke-width="1"/>
+<rect x="462" y="386" width="316" height="262" rx="12" fill="none" stroke="#C4BCF0" stroke-width="1.3"/>
+<text x="620.0" y="413" font-size="15" fill="#5B4BC4" font-weight="600" text-anchor="middle" letter-spacing="1.4">TRADER</text>
+<text x="620.0" y="427" font-size="10" fill="#57606A" text-anchor="middle">the call</text>
+<text x="482" y="460" font-size="11" fill="#5B4BC4">•</text>
+<text x="496" y="460" font-size="11" fill="#1F2328">reads the handoff, radar and x-ray</text>
+<text x="482" y="482" font-size="11" fill="#5B4BC4">•</text>
+<text x="496" y="482" font-size="11" fill="#1F2328">reads the rulebooks fresh, every run</text>
+<text x="482" y="504" font-size="11" fill="#5B4BC4">•</text>
+<text x="496" y="504" font-size="11" fill="#1F2328">runs the 7-gate stock / 8-gate ETF card</text>
+<text x="482" y="526" font-size="11" fill="#5B4BC4">•</text>
+<text x="496" y="526" font-size="11" fill="#1F2328">sizes from risk ÷ stop distance</text>
+<line x1="480" y1="554" x2="760" y2="554" stroke="#C4BCF0" stroke-width="1" stroke-linecap="round"/>
+<text x="482" y="574" font-size="10.5" fill="#5B4BC4" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ output/evaluation_&lt;date&gt;.md</text>
+<rect x="552.0" y="588" width="136" height="24" rx="6" fill="#DDF3E6" stroke="none" stroke-width="1"/>
+<text x="620.0" y="604" font-size="10.5" fill="#0E7C4A" font-weight="600" text-anchor="middle">edit: allowed</text>
+<text x="620.0" y="632" font-size="9.5" fill="#57606A" text-anchor="middle">the only agent that may write the report</text>
+<rect x="868" y="386" width="316" height="262" rx="12" fill="#FDEFF3" stroke="none" stroke-width="1"/>
+<rect x="868" y="386" width="316" height="46" rx="12" fill="#FBE1E8" stroke="none" stroke-width="1"/>
+<rect x="868" y="420" width="316" height="12" rx="0" fill="#FBE1E8" stroke="none" stroke-width="1"/>
+<rect x="868" y="386" width="316" height="262" rx="12" fill="none" stroke="#F0BECC" stroke-width="1.3"/>
+<text x="1026.0" y="413" font-size="15" fill="#B32448" font-weight="600" text-anchor="middle" letter-spacing="1.4">REVIEWER</text>
+<text x="1026.0" y="427" font-size="10" fill="#57606A" text-anchor="middle">adversarial pre-save check</text>
+<text x="888" y="460" font-size="11" fill="#B32448">•</text>
+<text x="902" y="460" font-size="11" fill="#1F2328">reconciles the roster, name by name</text>
+<text x="888" y="482" font-size="11" fill="#B32448">•</text>
+<text x="902" y="482" font-size="11" fill="#1F2328">checks the gate prefix against the card</text>
+<text x="888" y="504" font-size="11" fill="#B32448">•</text>
+<text x="902" y="504" font-size="11" fill="#1F2328">verifies every written level</text>
+<text x="888" y="526" font-size="11" fill="#B32448">•</text>
+<text x="902" y="526" font-size="11" fill="#1F2328">returns numbered defects, with evidence</text>
+<line x1="886" y1="554" x2="1166" y2="554" stroke="#F0BECC" stroke-width="1" stroke-linecap="round"/>
+<text x="888" y="574" font-size="10.5" fill="#B32448" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ PASS / FAIL + defect list</text>
+<rect x="958.0" y="588" width="136" height="24" rx="6" fill="#FBE3E8" stroke="none" stroke-width="1"/>
+<text x="1026.0" y="604" font-size="10.5" fill="#B32448" font-weight="600" text-anchor="middle">edit: denied</text>
+<text x="1026.0" y="632" font-size="9.5" fill="#57606A" text-anchor="middle">no opinion on any call · self-contained checklist</text>
+<line x1="378" y1="500" x2="450.0" y2="500.0" stroke="#9A6100" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M456.0 500.0L450.0 503.7L450.0 496.3Z" fill="#9A6100"/>
+<text x="417.0" y="492" font-size="9.5" fill="#9A6100" font-weight="600" text-anchor="middle">handoff</text>
+<line x1="784" y1="478" x2="856.0" y2="478.0" stroke="#5B4BC4" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M862.0 478.0L856.0 481.7L856.0 474.3Z" fill="#5B4BC4"/>
+<text x="823.0" y="470" font-size="9.5" fill="#5B4BC4" font-weight="600" text-anchor="middle">draft</text>
+<line x1="862" y1="516" x2="790.0" y2="516.0" stroke="#B32448" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M784.0 516.0L790.0 512.3L790.0 519.7Z" fill="#B32448"/>
+<text x="823.0" y="534" font-size="9.5" fill="#B32448" font-weight="600" text-anchor="middle">defects</text>
+<text x="823.0" y="547" font-size="8.5" fill="#8C959F" text-anchor="middle">max 3 rounds</text>
+<line x1="1026.0" y1="648" x2="1026.0" y2="684.0" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M1026.0 690.0L1022.3 684.0L1029.7 684.0Z" fill="#8C959F"/>
+<rect x="56" y="690" width="1128" height="50" rx="12" fill="#FFFFFF" stroke="#8C959F" stroke-width="1" stroke-dasharray="6 5"/>
+<text x="76" y="720" font-size="10" fill="#1F2328" font-weight="600" letter-spacing="1.1">SAVE GATE</text>
+<text x="174" y="720" font-size="11" fill="#57606A">eval_reviewer.py → 0 mechanical defects    ·    Reviewer → PASS    ·    anything else goes back to the Trader</text>
+<line x1="620" y1="740" x2="620.0" y2="758.0" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M620.0 764.0L616.3 758.0L623.7 758.0Z" fill="#8C959F"/>
+<rect x="180" y="764" width="420" height="100" rx="12" fill="#E7F4F5" stroke="#A9D5D9" stroke-width="1"/>
+<text x="200" y="790" font-size="13" fill="#0C6B75" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">output/evaluation_&lt;date&gt;.md</text>
+<text x="200" y="812" font-size="10.5" fill="#1F2328">one explicit signal per roster name,</text>
+<text x="200" y="828" font-size="10.5" fill="#1F2328">every actionable call with a written level</text>
+<text x="200" y="848" font-size="9.5" fill="#57606A" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">pointer: output/latest.md</text>
+<rect x="640" y="764" width="420" height="100" rx="12" fill="#FFF7EA" stroke="#E8CB9C" stroke-width="1"/>
+<text x="660" y="790" font-size="13" fill="#9A6100" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">output/ledger/pending_&lt;date&gt;.csv</text>
+<text x="660" y="812" font-size="10.5" fill="#1F2328">every non-trivial decision — including the blocks —</text>
+<text x="660" y="828" font-size="10.5" fill="#1F2328">drafted for the append-only ledger, never committed</text>
+<text x="660" y="848" font-size="9.5" fill="#57606A" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">you read the rows and --commit them yourself</text>
+<line x1="604" y1="814" x2="630.0" y2="814.0" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M636.0 814.0L630.0 817.7L630.0 810.3Z" fill="#8C959F"/>
+<text x="620" y="892" font-size="10.5" fill="#57606A" text-anchor="middle">Nothing places orders. Every output is a recommendation for a human to act on or ignore.</text>
+<text x="620" y="908" font-size="9.5" fill="#8C959F" text-anchor="middle">Process framework, not investment advice — see DISCLAIMER.md.  ·  Editable source: docs/3_agent_pipeline.svg</text>
+</svg>

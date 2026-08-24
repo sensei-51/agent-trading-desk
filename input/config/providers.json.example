@@ -1,0 +1,25 @@
+{
+  "_comment": [
+    "Provider selection, one entry per leg. THIS .example SHIPS ALL LEGS ON 'none'",
+    "so a fresh clone runs and reports INFERRED/ABSENT rather than fabricating a",
+    "pass. Copy it to providers.json (gitignored) and point the legs at what you",
+    "actually have.",
+    "",
+    "Run `python3 tools/fundamentals.py --list-providers` to see what is installed.",
+    "",
+    "fundamentals — 'derived' needs no subscription: it rebuilds a composite from",
+    "free Yahoo data and marks every row approximate. Calibrated 18 Aug 2026,",
+    "r=0.88 vs a curated scorer. See docs/DERIVED_CALIBRATION_2026-08-18.md.",
+    "",
+    "flow / conviction — there is no free substitute for either, and that is fine.",
+    "DATA_SOURCES.md is explicit: drop a leg you cannot source rather than proxy",
+    "it. 'none' renders them ABSENT and the rules already handle that.",
+    "",
+    "fallback fires ONLY when the primary returns FAIL for a ticker. Setting it to",
+    "'none' is rejected: a primary failure must not silently fabricate data. Use",
+    "null to disable it."
+  ],
+  "fundamentals": { "provider": "none", "fallback": null },
+  "flow":         { "provider": "none", "fallback": null },
+  "conviction":   { "provider": "none", "fallback": null }
+}

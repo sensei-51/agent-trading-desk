@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="946" viewBox="0 0 1240 946" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="1240" height="946" fill="#FFFFFF"/>
+<text x="620.0" y="43" font-size="23" fill="#1F2328" font-weight="600" text-anchor="middle">How one name is read</text>
+<text x="620.0" y="67" font-size="12.5" fill="#57606A" text-anchor="middle">Three measurements on three different clocks — and three independent ways for a name to be refused. Every threshold below is the one in the code.</text>
+<rect x="56" y="88" width="1128" height="304" rx="12" fill="#FBFCFD" stroke="#E1E6EC" stroke-width="1"/>
+<text x="76" y="112" font-size="10" fill="#3D4C63" font-weight="600" letter-spacing="1.1">1 · THE SHAPE — what the daily screen is looking for</text>
+<text x="1164" y="112" font-size="10.5" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" text-anchor="end">engine/heartbeat_radar.py</text>
+<line x1="96" y1="272" x2="1160" y2="252" stroke="#B8860B" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+<text x="1156" y="241" font-size="10" fill="#B8860B" text-anchor="end">150-day line, rising — the trend gate that is never waived</text>
+<rect x="332.20799999999997" y="145.0" width="827.792" height="14" rx="0" fill="#0E7C4A" opacity="0.09"/>
+<line x1="332.20799999999997" y1="152.0" x2="1160" y2="152.0" stroke="#0E7C4A" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="6 4"/>
+<text x="340.20799999999997" y="140.0" font-size="10" fill="#0E7C4A">prior high — the highest close of the last 200 sessions, last 10 excluded  ·  ±3% either side of it = AT-BREAKOUT  ·  more than 3% past it = EXTENDED&gt;BREAK</text>
+<path d="M96.0 248.0L122.2 232.9L148.5 230.0L174.7 209.4L201.0 207.5L227.2 191.4L253.5 189.5L279.7 171.1L306.0 167.1L332.2 146.5L356.9 169.9L381.7 182.9L406.4 205.0L431.2 216.6L461.2 199.6L491.2 216.4L521.2 199.6L551.2 216.4L581.3 199.6L611.3 216.4L641.3 199.6L671.3 216.4L701.3 199.6L731.4 216.4L761.4 199.6L791.4 216.4L821.4 199.6L851.4 216.4L895.5 197.7L939.6 179.8L983.7 172.3L1027.8 152.9L1071.8 145.4L1115.9 129.9L1160.0 123.2" fill="none" stroke="#1F2328" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="415.2" y="190" width="452.2" height="36" rx="0" fill="#B32448" opacity="0.055"/>
+<rect x="415.2" y="190" width="452.2" height="36" rx="0" fill="none" stroke="#B32448" stroke-width="1.4" stroke-dasharray="5 4"/>
+<path d="M415.2 226L415.2 232L867.4 232L867.4 226" fill="none" stroke="#B32448" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="641.3" y="247" font-size="10" fill="#B32448" text-anchor="middle">the 20-day range — measured, then ranked against this name's own year</text>
+<rect x="96.0" y="290.8" width="10" height="25.2" rx="1.5" fill="#7FC7A4"/>
+<rect x="112.0" y="288.2" width="10" height="27.8" rx="1.5" fill="#7FC7A4"/>
+<rect x="128.0" y="291.6" width="10" height="24.4" rx="1.5" fill="#7FC7A4"/>
+<rect x="144.0" y="286.8" width="10" height="29.2" rx="1.5" fill="#7FC7A4"/>
+<rect x="160.0" y="289.8" width="10" height="26.2" rx="1.5" fill="#7FC7A4"/>
+<rect x="176.0" y="285.0" width="10" height="31.0" rx="1.5" fill="#7FC7A4"/>
+<rect x="192.0" y="289.2" width="10" height="26.8" rx="1.5" fill="#7FC7A4"/>
+<rect x="208.0" y="286.0" width="10" height="30.0" rx="1.5" fill="#7FC7A4"/>
+<rect x="224.0" y="290.4" width="10" height="25.6" rx="1.5" fill="#7FC7A4"/>
+<rect x="240.0" y="287.6" width="10" height="28.4" rx="1.5" fill="#7FC7A4"/>
+<rect x="256.0" y="290.8" width="10" height="25.2" rx="1.5" fill="#7FC7A4"/>
+<rect x="272.0" y="288.2" width="10" height="27.8" rx="1.5" fill="#7FC7A4"/>
+<rect x="288.0" y="291.6" width="10" height="24.4" rx="1.5" fill="#7FC7A4"/>
+<rect x="304.0" y="286.8" width="10" height="29.2" rx="1.5" fill="#7FC7A4"/>
+<rect x="320.0" y="289.8" width="10" height="26.2" rx="1.5" fill="#7FC7A4"/>
+<rect x="336.0" y="285.2" width="10" height="30.8" rx="1.5" fill="#E8A0B2"/>
+<rect x="352.0" y="289.0" width="10" height="27.0" rx="1.5" fill="#E8A0B2"/>
+<rect x="368.0" y="286.1" width="10" height="29.9" rx="1.5" fill="#E8A0B2"/>
+<rect x="384.0" y="290.1" width="10" height="25.9" rx="1.5" fill="#E8A0B2"/>
+<rect x="400.0" y="287.6" width="10" height="28.4" rx="1.5" fill="#E8A0B2"/>
+<rect x="416.0" y="290.4" width="10" height="25.6" rx="1.5" fill="#E8A0B2"/>
+<rect x="432.0" y="309.1" width="10" height="6.9" rx="1.5" fill="#C9D1D9"/>
+<rect x="448.0" y="310.0" width="10" height="6.0" rx="1.5" fill="#C9D1D9"/>
+<rect x="464.0" y="308.8" width="10" height="7.2" rx="1.5" fill="#C9D1D9"/>
+<rect x="480.0" y="309.6" width="10" height="6.4" rx="1.5" fill="#C9D1D9"/>
+<rect x="496.0" y="308.3" width="10" height="7.7" rx="1.5" fill="#C9D1D9"/>
+<rect x="512.0" y="309.4" width="10" height="6.6" rx="1.5" fill="#C9D1D9"/>
+<rect x="528.0" y="308.6" width="10" height="7.4" rx="1.5" fill="#C9D1D9"/>
+<rect x="544.0" y="309.7" width="10" height="6.3" rx="1.5" fill="#C9D1D9"/>
+<rect x="560.0" y="309.0" width="10" height="7.0" rx="1.5" fill="#C9D1D9"/>
+<rect x="576.0" y="309.8" width="10" height="6.2" rx="1.5" fill="#C9D1D9"/>
+<rect x="592.0" y="309.1" width="10" height="6.9" rx="1.5" fill="#C9D1D9"/>
+<rect x="608.0" y="310.0" width="10" height="6.0" rx="1.5" fill="#C9D1D9"/>
+<rect x="624.0" y="308.8" width="10" height="7.2" rx="1.5" fill="#C9D1D9"/>
+<rect x="640.0" y="309.6" width="10" height="6.4" rx="1.5" fill="#C9D1D9"/>
+<rect x="656.0" y="308.3" width="10" height="7.7" rx="1.5" fill="#C9D1D9"/>
+<rect x="672.0" y="309.4" width="10" height="6.6" rx="1.5" fill="#C9D1D9"/>
+<rect x="688.0" y="308.6" width="10" height="7.4" rx="1.5" fill="#C9D1D9"/>
+<rect x="704.0" y="309.7" width="10" height="6.3" rx="1.5" fill="#C9D1D9"/>
+<rect x="720.0" y="309.0" width="10" height="7.0" rx="1.5" fill="#C9D1D9"/>
+<rect x="736.0" y="309.8" width="10" height="6.2" rx="1.5" fill="#C9D1D9"/>
+<rect x="752.0" y="309.1" width="10" height="6.9" rx="1.5" fill="#C9D1D9"/>
+<rect x="768.0" y="310.0" width="10" height="6.0" rx="1.5" fill="#C9D1D9"/>
+<rect x="784.0" y="308.8" width="10" height="7.2" rx="1.5" fill="#C9D1D9"/>
+<rect x="800.0" y="309.6" width="10" height="6.4" rx="1.5" fill="#C9D1D9"/>
+<rect x="816.0" y="308.3" width="10" height="7.7" rx="1.5" fill="#C9D1D9"/>
+<rect x="832.0" y="309.4" width="10" height="6.6" rx="1.5" fill="#C9D1D9"/>
+<rect x="848.0" y="308.6" width="10" height="7.4" rx="1.5" fill="#C9D1D9"/>
+<rect x="864.0" y="276.0" width="10" height="40.0" rx="1.5" fill="#0E7C4A"/>
+<rect x="880.0" y="295.9" width="10" height="20.1" rx="1.5" fill="#7FC7A4"/>
+<rect x="896.0" y="298.1" width="10" height="17.9" rx="1.5" fill="#7FC7A4"/>
+<rect x="912.0" y="296.3" width="10" height="19.7" rx="1.5" fill="#7FC7A4"/>
+<rect x="928.0" y="298.7" width="10" height="17.3" rx="1.5" fill="#7FC7A4"/>
+<rect x="944.0" y="295.3" width="10" height="20.7" rx="1.5" fill="#7FC7A4"/>
+<rect x="960.0" y="297.4" width="10" height="18.6" rx="1.5" fill="#7FC7A4"/>
+<rect x="976.0" y="294.1" width="10" height="21.9" rx="1.5" fill="#7FC7A4"/>
+<rect x="992.0" y="297.0" width="10" height="19.0" rx="1.5" fill="#7FC7A4"/>
+<rect x="1008.0" y="294.8" width="10" height="21.2" rx="1.5" fill="#7FC7A4"/>
+<rect x="1024.0" y="297.8" width="10" height="18.2" rx="1.5" fill="#7FC7A4"/>
+<rect x="1040.0" y="295.9" width="10" height="20.1" rx="1.5" fill="#7FC7A4"/>
+<rect x="1056.0" y="298.1" width="10" height="17.9" rx="1.5" fill="#7FC7A4"/>
+<rect x="1072.0" y="296.3" width="10" height="19.7" rx="1.5" fill="#7FC7A4"/>
+<rect x="1088.0" y="298.7" width="10" height="17.3" rx="1.5" fill="#7FC7A4"/>
+<rect x="1104.0" y="295.3" width="10" height="20.7" rx="1.5" fill="#7FC7A4"/>
+<rect x="1120.0" y="297.4" width="10" height="18.6" rx="1.5" fill="#7FC7A4"/>
+<rect x="1136.0" y="294.1" width="10" height="21.9" rx="1.5" fill="#7FC7A4"/>
+<line x1="92" y1="316" x2="1160" y2="316" stroke="#E1E6EC" stroke-width="1" stroke-linecap="round"/>
+<text x="88" y="314" font-size="8.5" fill="#8C959F" text-anchor="end">vol</text>
+<text x="214.10399999999998" y="342" font-size="10" fill="#57606A" text-anchor="middle">①  the prior run</text>
+<text x="381.15200000000004" y="342" font-size="10" fill="#57606A" text-anchor="middle">②  the pullback</text>
+<text x="640.768" y="342" font-size="10" fill="#57606A" text-anchor="middle">③  the coil — this is the heartbeat</text>
+<text x="1008.912" y="342" font-size="10" fill="#57606A" text-anchor="middle">④  the break, on 2× the 60-day volume</text>
+<text x="640.768" y="360" font-size="9.8" fill="#8C959F" text-anchor="middle">volume drying up inside the box is a condition, not a nicety: a range this tight on rising volume is a fight, not an accumulation</text>
+<rect x="56" y="410" width="365.3333333333333" height="414" rx="10" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
+<rect x="56" y="410" width="365.3333333333333" height="4" rx="2" fill="#3D4C63"/>
+<text x="74" y="440" font-size="14" fill="#1F2328" font-weight="600">Heartbeat range</text>
+<text x="74" y="457" font-size="9" fill="#3D4C63" font-weight="600" letter-spacing="0.9">RANKED AGAINST ITS OWN YEAR</text>
+<line x1="74" y1="467" x2="403.3333333333333" y2="467" stroke="#C6D0E0" stroke-width="1" stroke-linecap="round"/>
+<text x="74" y="488" font-size="11" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">rng20</text>
+<text x="74" y="503.0" font-size="10.5" fill="#57606A">(highest ÷ lowest of the last 20 closes − 1) × 100.</text>
+<text x="74" y="522.5" font-size="11" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">rng_pctl</text>
+<text x="74" y="537.5" font-size="10.5" fill="#57606A">where that sits among up to 253 rolling 20-day ranges drawn from</text>
+<text x="74" y="551.0" font-size="10.5" fill="#57606A">this name's own last 272 sessions.</text>
+<text x="74" y="574.5" font-size="10.5" fill="#1F2328" font-weight="600">HEARTBEAT needs all four:</text>
+<text x="82" y="590.5" font-size="10.5" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">rng_pctl ≤ 25</text>
+<text x="170.173" y="590.5" font-size="9.8" fill="#8C959F">bottom quartile of its own year</text>
+<text x="82" y="606.0" font-size="10.5" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">rng20 ≤ 25%</text>
+<text x="157.531" y="606.0" font-size="9.8" fill="#8C959F">and tight in absolute terms too</text>
+<text x="82" y="621.5" font-size="10.5" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">v20 &lt; v60</text>
+<text x="144.889" y="621.5" font-size="9.8" fill="#8C959F">20-day volume under the 60-day</text>
+<text x="82" y="637.0" font-size="10.5" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">px ≥ 150d line</text>
+<text x="176.49399999999997" y="637.0" font-size="9.8" fill="#8C959F">rising = +0.1% on its 10-day-ago read</text>
+<text x="74" y="664.5" font-size="9.8" fill="#8C959F">Under 160 sessions of history the primary line falls back to 50-day and the</text>
+<text x="74" y="677.5" font-size="9.8" fill="#8C959F">row is marked 50d* — reported, never quietly dropped.</text>
+<rect x="70" y="749" width="337.3333333333333" height="61" rx="6" fill="#F0F3F8"/>
+<text x="82" y="770" font-size="9.8" fill="#3D4C63">A fixed “20-day range ≤ 7%” only ever fires on ETFs and staples. A</text>
+<text x="82" y="783" font-size="9.8" fill="#3D4C63">high-beta name coils tightly by its own standards and never by anyone</text>
+<text x="82" y="796" font-size="9.8" fill="#3D4C63">else's — so the bar is a percentile.</text>
+<rect x="437.3333333333333" y="410" width="365.3333333333333" height="414" rx="10" fill="#FFFFFF" stroke="#C4BCF0" stroke-width="1"/>
+<rect x="437.3333333333333" y="410" width="365.3333333333333" height="4" rx="2" fill="#4B3FA8"/>
+<text x="455.3333333333333" y="440" font-size="14" fill="#1F2328" font-weight="600">Momentum</text>
+<text x="455.3333333333333" y="457" font-size="9" fill="#4B3FA8" font-weight="600" letter-spacing="0.9">RANKED ACROSS THE CORE UNIVERSE</text>
+<line x1="455.3333333333333" y1="467" x2="784.6666666666666" y2="467" stroke="#C4BCF0" stroke-width="1" stroke-linecap="round"/>
+<text x="455.3333333333333" y="488" font-size="11" fill="#4B3FA8" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">rs</text>
+<text x="455.3333333333333" y="503.0" font-size="10.5" fill="#57606A">0.4×3m + 0.3×6m + 0.3×12m excess return over SPY (USD) or ISF.L</text>
+<text x="455.3333333333333" y="516.5" font-size="10.5" fill="#57606A">(GBP) — recency-weighted.</text>
+<text x="455.3333333333333" y="536.0" font-size="11" fill="#4B3FA8" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">rs_pctl</text>
+<text x="455.3333333333333" y="551.0" font-size="10.5" fill="#57606A">its percentile across the core universe — speculatives excluded, and</text>
+<text x="455.3333333333333" y="564.5" font-size="10.5" fill="#57606A">they can never be RS-LEADER. ≥ 80 fires it.</text>
+<text x="455.3333333333333" y="584.0" font-size="11" fill="#4B3FA8" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">acc</text>
+<text x="455.3333333333333" y="599.0" font-size="10.5" fill="#57606A">20-day up-day volume ÷ down-day volume. Above 1 = net</text>
+<text x="455.3333333333333" y="612.5" font-size="10.5" fill="#57606A">accumulation.</text>
+<text x="455.3333333333333" y="632.0" font-size="11" fill="#4B3FA8" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">vratio + direction</text>
+<text x="455.3333333333333" y="647.0" font-size="10.5" fill="#57606A">biggest bar in the last 5 sessions ÷ the 60-day average, tagged with</text>
+<text x="455.3333333333333" y="660.5" font-size="10.5" fill="#57606A">that day's direction. ≥ 2.0 → VOL-2X-UP or VOL-2X-DOWN.</text>
+<text x="455.3333333333333" y="680.0" font-size="11" fill="#4B3FA8" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">r5 · r20 · r60</text>
+<text x="455.3333333333333" y="695.0" font-size="10.5" fill="#57606A">plain session returns. They drive nothing on their own: the</text>
+<text x="455.3333333333333" y="708.5" font-size="10.5" fill="#57606A">sector-pressure table aggregates them and emits no tag.</text>
+<rect x="451.3333333333333" y="749" width="337.3333333333333" height="61" rx="6" fill="#F2F0FD"/>
+<text x="463.3333333333333" y="770" font-size="9.8" fill="#4B3FA8">Direction is the whole of it. A 2× volume bar on a down day is</text>
+<text x="463.3333333333333" y="783" font-size="9.8" fill="#4B3FA8">distribution, and a magnitude-only read files it as a buy signal — which</text>
+<text x="463.3333333333333" y="796" font-size="9.8" fill="#4B3FA8">is why acc is measured separately, over 20 days.</text>
+<rect x="818.6666666666666" y="410" width="365.3333333333333" height="414" rx="10" fill="#FFFFFF" stroke="#A9D5D9" stroke-width="1"/>
+<rect x="818.6666666666666" y="410" width="365.3333333333333" height="4" rx="2" fill="#0F6B72"/>
+<text x="836.6666666666666" y="440" font-size="14" fill="#1F2328" font-weight="600">Anticipated growth</text>
+<text x="836.6666666666666" y="457" font-size="9" fill="#0F6B72" font-weight="600" letter-spacing="0.9">RANKED AGAINST A FIXED BAR</text>
+<line x1="836.6666666666666" y1="467" x2="1166.0" y2="467" stroke="#A9D5D9" stroke-width="1" stroke-linecap="round"/>
+<text x="836.6666666666666" y="486" font-size="9.2" fill="#0F6B72" font-weight="600" letter-spacing="0.7">IS THE BUSINESS ACCELERATING?</text>
+<text x="836.6666666666666" y="504.0" font-size="9.5" fill="#57606A">Composite score /100, five pillar sub-scores, and the ACCEL / RECORD tags</text>
+<text x="836.6666666666666" y="517.5" font-size="9.5" fill="#57606A">— whichever provider you plug in.</text>
+<text x="836.6666666666666" y="535.0" font-size="10.5" fill="#0F6B72" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">gate 1</text>
+<text x="884.6666666666666" y="535.0" font-size="10.5" fill="#1F2328">score ≥ 60 AND ACCEL or RECORD</text>
+<text x="836.6666666666666" y="551.0" font-size="10.5" fill="#0F6B72" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">gate 2</text>
+<text x="884.6666666666666" y="551.0" font-size="10.5" fill="#1F2328">cash flow ≥ 7/10 · stability ≥ 5/10</text>
+<text x="884.6666666666666" y="567.0" font-size="10.5" fill="#1F2328">profit ≥ 13/30</text>
+<line x1="836.6666666666666" y1="587.0" x2="1166.0" y2="587.0" stroke="#A9D5D9" stroke-width="1" stroke-linecap="round"/>
+<text x="836.6666666666666" y="603.0" font-size="9.2" fill="#0F6B72" font-weight="600" letter-spacing="0.7">IS ANY OF IT ALREADY IN THE PRICE?</text>
+<text x="836.6666666666666" y="621.0" font-size="9.5" fill="#57606A">The other half, and deliberately a separate test: growth you can still be paid</text>
+<text x="836.6666666666666" y="634.5" font-size="9.5" fill="#57606A">for.</text>
+<text x="836.6666666666666" y="652.0" font-size="10.5" fill="#0F6B72" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">gate 6</text>
+<text x="884.6666666666666" y="652.0" font-size="10.5" fill="#1F2328">≥ 15% below consensus, and not</text>
+<text x="884.6666666666666" y="668.0" font-size="10.5" fill="#1F2328">within 10% of the 52-week high</text>
+<text x="836.6666666666666" y="694.0" font-size="9.8" fill="#8C959F">One exception, and only one: a fresh volume breakout above a completed</text>
+<text x="836.6666666666666" y="707.0" font-size="9.8" fill="#8C959F">base may enter at a new high.</text>
+<rect x="832.6666666666666" y="749" width="337.3333333333333" height="61" rx="6" fill="#E7F4F5"/>
+<text x="844.6666666666666" y="770" font-size="9.8" fill="#0F6B72">Record earnings with nothing left to pay for them is the commonest</text>
+<text x="844.6666666666666" y="783" font-size="9.8" fill="#0F6B72">failure on record: 18 of the 40 check-failures in the ledger are gate 6,</text>
+<text x="844.6666666666666" y="796" font-size="9.8" fill="#0F6B72">against 7 for the next-highest.</text>
+<rect x="56" y="842" width="1128" height="78" rx="12" fill="#FBFCFD" stroke="#E1E6EC" stroke-width="1"/>
+<rect x="78" y="868" width="66.141" height="26" rx="13" fill="#F0F3F8" stroke="#C6D0E0" stroke-width="1"/>
+<text x="111.07050000000001" y="885" font-size="10.5" fill="#3D4C63" font-weight="600" text-anchor="middle">coiled?</text>
+<rect x="154.14100000000002" y="868" width="101.946" height="26" rx="13" fill="#F2F0FD" stroke="#C4BCF0" stroke-width="1"/>
+<text x="205.11400000000003" y="885" font-size="10.5" fill="#4B3FA8" font-weight="600" text-anchor="middle">being bought?</text>
+<rect x="266.087" y="868" width="113.601" height="26" rx="13" fill="#E7F4F5" stroke="#A9D5D9" stroke-width="1"/>
+<text x="322.8875" y="885" font-size="10.5" fill="#0F6B72" font-weight="600" text-anchor="middle">room left to run?</text>
+<line x1="393.688" y1="881" x2="409.188" y2="881.0" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M415.69 881L409.19 885.03L409.19 876.97Z" fill="#8C959F"/>
+<rect x="423.688" y="866" width="277.41650000000004" height="30" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
+<text x="562.39625" y="885" font-size="10.5" fill="#1F2328" font-weight="600" text-anchor="middle">GATE CARD — 7 checks for a stock, 8 for an ETF</text>
+<line x1="707.1045" y1="881" x2="722.6045" y2="881.0" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M729.1 881L722.6 885.03L722.6 876.97Z" fill="#8C959F"/>
+<rect x="737.1045" y="866" width="200.66699999999997" height="30" rx="8" fill="#0E7C4A" opacity="0.09"/>
+<text x="837.438" y="885" font-size="10.5" fill="#0E7C4A" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" text-anchor="middle">size = risk ÷ stop distance</text>
+<text x="78" y="860" font-size="10" fill="#57606A">None of the three can outvote another. A name can be maximally coiled, top-decile momentum and posting record earnings — and still be refused on headroom alone.</text>
+<text x="1162" y="910" font-size="9" fill="#8C959F" text-anchor="end">and never from conviction</text>
+</svg>

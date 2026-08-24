@@ -1,0 +1,8 @@
+Date,Ticker,Account,Source,Gate_Result,Action,Qty,Avg_Entry,Ccy,Price_At_Decision,Status,Exit_Date,Exit_Price,Notes
+2026-01-05,EXMPL,A,weekly-sweep,S 7/7,ENTERED,25,100.00,USD,100.00,OPEN,,,Full size at trigger. Both stops set: trading 87.50 / investing 78.00.
+2026-01-06,EXMP2,A,weekly-sweep,S fail #5,BLOCKED,,,USD,42.10,N/A,,,Earnings in 4 days. Binary risk. Revisit post-print.
+2026-01-07,EXMP3,A,research-note,S fail #1 #6,WATCHLIST,,,USD,8.85,N/A,,,Score 41 (below 60) and 6% from 52w high. Two fails.
+2026-01-09,EXMP4,A,radar-flag,S fail #6,STARTER-CAP,10,55.20,USD,55.20,OPEN,,,Consensus headroom 9% (<15%). Half risk only.
+2026-01-12,EXMP5,B,rotation-in,E 8/8,ENTERED,120,42.30,GBP,42.30,OPEN,,,Sector ROTATION-IN. Signal-ruled: 150d @ 38.90. No milestone stop.
+2026-01-14,EXMP6,B,rotation-in,E fail #8,BLOCKED,,,GBP,18.55,N/A,,,Top-10 overlap 14% of NAV with an existing line. Not starter-eligible.
+2026-02-03,EXMPL,A,stop-review,N/A,EXITED,25,100.00,USD,,CLOSED,2026-02-03,118.40,Trailing ratchet: closed below the +10% locked stop.

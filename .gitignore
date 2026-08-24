@@ -1,0 +1,69 @@
+# ── Your raw broker exports never get committed ─────────────────────
+# Real exports carry account numbers and your actual sleeve size. Publish via
+#   python3 tools/anonymise.py ~/Downloads/export.csv
+# which scales everything to a nominal NAV and writes a *.public.csv — the form
+# the negation line below deliberately allows through.
+# (gitignore has no inline comments: a trailing "# ..." becomes part of the
+#  pattern and silently breaks it. Keep every comment on its own line.)
+input/*.csv
+input/watchlist.md
+input/watchlist_*.md
+# your real positions, scaled by tools/anonymise.py — allowed through:
+!input/*.public.csv
+
+# ── Local source config stays local ─────────────────────────────────
+# The repo ships input/config/fundamentals.json.example with the publish-safe
+# "none" adapter. Your live adapter choice (e.g. "curated") is a local override
+# and never commits — otherwise every commit flips the public default.
+input/config/fundamentals.json
+
+# Your tracking files are yours; the shipped versions are references.
+# Uncomment this line to keep the reference files private:
+# input/tracking/*.md
+
+# ── Generated output IS committed, on purpose ───────────────────────
+# This repo publishes its own running history — radar reports, evaluations, P&L and
+# the gate ledger — so a reader can audit whether the gates actually filtered out
+# winners or saved money, rather than taking the rules on trust. That claim is the
+# whole point of the ledger and it cannot be checked against an empty folder.
+#
+# ⚠️  Everything under output/ is therefore PUBLIC. Regenerate it from the scaled
+# holdings, never from a real export, or the reports carry the real numbers straight
+# past the input/ gitignore above. `python3 tools/checks.py --publish` greps the
+# tree for real-NAV strings before any push.
+output/.state/
+output/ledger/pending_*.csv
+
+# ── Standard ────────────────────────────────────────────────────────
+.claude/agents/.probe
+node_modules/
+package-lock.json
+__pycache__/
+*.py[cod]
+*.bak
+*.bak.*
+.venv/
+venv/
+.env
+.DS_Store
+.idea/
+.vscode/
+_to_delete/
+
+# ---------------------------------------------------------------------------
+# Private providers and the data they read (19 Aug 2026).
+#
+# These two lines ARE the public/private boundary. `tools/publish.py` builds the
+# public tree by declining to copy these directories, and `checks.py --publish`
+# FAILs if a provider declaring `private: True` is discoverable in the tree
+# being published. Structural, not a text sweep — a grep for vendor names passes
+# the moment someone writes "the paid provider" in a docstring.
+providers/private/
+input/capture/
+
+# Live provider selection. The committed .example ships every leg on `none`, so
+# a clone runs honestly; your actual choices never commit.
+input/config/providers.json
+
+# tools/rerun.py sandboxes (same-day test re-runs; contain real NAV)
+.rerun/
