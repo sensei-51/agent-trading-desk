@@ -10,8 +10,7 @@ of this file and its own scheduled task. Do not evaluate another sleeve's ticker
 write to its files.
 
 **Output file:** `output/evaluation_<date>.md` (e.g. `output/evaluation_2026-08-15.md`)
-— dated, accumulates across runs — plus the `output/latest.md` pointer, which
-points at the newest one.
+— dated, accumulates across runs.
 
 ---
 
@@ -102,7 +101,7 @@ it up.
 |---|---|---|
 | 1 | **Roster** | `hr.load_roster` + `hr.load_watchlists`; `input/*.csv` holdings, `input/watchlist*.md` — `docs/TECHNICAL_ARCHITECTURE.md` Ticker lifecycle |
 | 2 | **Analyst sheet** | `output/data/analyst_<date>.md` — produced today by the Analyst subagent. Do not run without it; if missing, halt. |
-| 3 | **Analyst's deterministic outputs** | `output/data/latest.md`, `output/data/fundamentals_latest.md`, `output/data/xray_latest.md`, `output/radar/latest.md` |
+| 3 | **Analyst's deterministic outputs** | `output/data/facts_<date>.md`, `output/data/fundamentals_<date>.md`, `output/data/xray_<date>.md`, `output/radar/Heartbeat_Radar_<date>.md` |
 | 4 | **Rulebooks (read fresh)** | `rules/01_METHOD.md`, `rules/02_SLEEVE_RULES.md`. **Stricter wins** across Method → Sleeve Rules → Watchlist; Speculative Tier is the deliberate size-limited exception. |
 | 5 | **Sector map** | `input/tracking/sector_map.md` — authoritative ticker → sector + bellwether ETF table |
 | 6 | **Stop-loss log** | output ledger; existing stops on held positions |
@@ -163,7 +162,7 @@ interface to another tool, and the handling rules that outlive any particular la
    meaningless hit rate.
 
 3. **Two blocks are quoted from a generated file, never recomputed.** The sector-weights
-   table and the portfolio-growth chart come from `output/data/xray_latest.md` as drawn by
+   table and the portfolio-growth chart come from `output/data/xray_<date>.md` as drawn by
    `tools/xray.py`; the radar age comes from `run_manifest.json`'s `radar.verdict`. Both
    are lookups — a report that re-derives either can disagree with its own source, which
    is the 2026-08-18 failure `tools/run_daily.py` exists to prevent.

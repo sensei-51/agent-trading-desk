@@ -115,7 +115,7 @@ AGENTS = {
                 "description: {description}",
                 "mode: subagent",
                 "permission:",
-                "  edit: allow",  # writes output/evaluation_<date>.md + output/latest.md pointer
+                "  edit: allow",  # writes output/evaluation_<date>.md + its sidecar
             ],
         },
     },

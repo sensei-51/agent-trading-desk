@@ -174,7 +174,7 @@ Phase A     radar <verdict verbatim> · run <N> · legs: <any ABSENT/STALE legs>
 Analyst     output/data/analyst_<date>.md
 Trader      <TRADER: status line> · Coverage N/N
 Review      eval_reviewer <n> defects · manager <PASS|FAIL> · <r> round(s)
-Evaluation  output/evaluation_<date>.md  (pointer: output/latest.md)
+Evaluation  output/evaluation_<date>.md
 Ledger      Gate_Ledger.csv — <n> row(s) recorded<, replacing <m> from an earlier run>
 ```
 

@@ -27,7 +27,7 @@ Inputs   input/*.csv                    broker exports (sterling value per line)
          output/.state/nav_history.json running NAV history (appended each run)
 Output   output/data/xray_<date>.md     dated report (human)
          output/data/xray_<date>.json   structured sidecar (machines — see BACKLOG item 2)
-         output/data/xray_latest.md     pointer (a copy, like facts.py)
+         output/data/xray_<date>.json   structured sidecar for the reviewer
 
 Usage    python3 tools/xray.py
          python3 tools/xray.py --check-history    # verify only; exit 1 on drift
@@ -119,7 +119,7 @@ def load_rows():
             if not conv:
                 unconverted.append((sym, row.get(vcol)))
                 continue
-            sec = smap.get(sym) or smap.get(sym + ".L")
+            sec = hr.map_sector(sym, smap)
             if not sec:
                 no_sector.append(sym)
             out.append((sym, val, sec or "Unclassified", base, parse_qty(
@@ -527,10 +527,9 @@ def main():
     out_dir = os.path.join(OUTPUT_DIR, "data")
     os.makedirs(out_dir, exist_ok=True)
     today = datetime.date.today().isoformat()
-    for p in (os.path.join(out_dir, f"xray_{today}.md"),
-              os.path.join(out_dir, "xray_latest.md")):
-        with open(p, "w", encoding="utf-8") as f:
-            f.write(body)
+    md_path = os.path.join(out_dir, f"xray_{today}.md")
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write(body)
 
     # ---- structured sidecar ------------------------------------------------
     # The .md is for a human; this is for the machines. `eval_reviewer` check
@@ -553,14 +552,12 @@ def main():
                      "pct_nav": round(v / total * 100, 2) if total else 0.0}
                     for sec, v in ordered],
     }
-    for p in (os.path.join(out_dir, f"xray_{today}.json"),
-              os.path.join(out_dir, "xray_latest.json")):
-        with open(p, "w", encoding="utf-8") as f:
-            json.dump(payload, f, indent=1)
-            f.write("\n")
+    with open(os.path.join(out_dir, f"xray_{today}.json"), "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=1)
+        f.write("\n")
 
     top = ", ".join(f"{sec} {v/total*100:.0f}%" for sec, v in ordered[:3])
-    print(f"Wrote {os.path.join(out_dir, 'xray_latest.md')}")
+    print(f"Wrote {md_path}")
     print(f"  NAV £{total:,.0f} · {len(rows)} holdings · top: {top}"
           + (f" · export dated {data_date}" if data_date else ""))
     if no_sector and not a.allow_unclassified:

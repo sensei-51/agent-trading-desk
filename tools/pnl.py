@@ -20,7 +20,7 @@ no recorded price can never be scored, and is simply lost evidence.
 
 Inputs   output/ledger/Gate_Ledger.csv   (append-only; see templates/)
          live prices, fetched over HTTP
-Output   output/reports/PnL_<date>.md    + latest.md pointer
+Output   output/reports/PnL_<date>.md
 
 Usage    python3 tools/pnl.py
          python3 tools/pnl.py --min-age 30 --out somewhere.md
@@ -383,7 +383,6 @@ def main():
                          f"(default {MIN_AGE_DAYS})")
     ap.add_argument("--offline", action="store_true",
                     help="Skip price fetches. Realised P&L only.")
-    ap.add_argument("--no-latest", action="store_true")
     a = ap.parse_args()
 
     rows = load_ledger(a.ledger)
@@ -407,19 +406,6 @@ def main():
     os.makedirs(os.path.dirname(os.path.abspath(outfile)), exist_ok=True)
     with open(outfile, "w", encoding="utf-8") as f:
         f.write(body)
-
-    # Plain copy, not a symlink — a write *to* a symlinked pointer follows the
-    # link and destroys the dated file behind it (docs/BACKLOG.md item 19).
-    # Every latest*.md in this repo is a copy for that reason.
-    if not a.no_latest:
-        latest = os.path.join(os.path.dirname(os.path.abspath(outfile)), "latest.md")
-        try:
-            if os.path.islink(latest):
-                os.remove(latest)            # migrate an older symlinked pointer
-            with open(latest, "w", encoding="utf-8") as f:
-                f.write(body)
-        except OSError:
-            pass
 
     print(f"written: {outfile}")
     print(f"  {len(rows)} ledger rows · {len(tickers)} priced · "

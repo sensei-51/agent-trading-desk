@@ -36,7 +36,7 @@ assume yesterday's interpretation is still right.
 |---|---|---|
 | 1 | **Roster** | `hr.load_roster` + `hr.load_watchlists` (run `python3 engine/heartbeat_radar.py` if not already); `input/*.csv` holdings, `input/watchlist*.md` |
 | 2 | **Analyst sheet** | `output/data/analyst_<date>.md` — produced today by the Analyst subagent. Source-config status, FAIL/PARTIAL/NONE resolutions, theme news. *If missing or older than today, halt and say so. Do not run without it.* |
-| 3 | **Analyst's deterministic outputs** | `output/data/latest.md` (facts), `output/data/fundamentals_latest.md` (fundamentals), `output/data/xray_latest.md` (sector x-ray + NAV), `output/radar/latest.md` |
+| 3 | **Analyst's deterministic outputs** | `output/data/facts_<date>.md` (facts), `output/data/fundamentals_<date>.md` (fundamentals), `output/data/xray_<date>.md` (sector x-ray + NAV), `output/radar/Heartbeat_Radar_<date>.md` |
 | 4 | **Rulebooks (read fresh this run)** | `rules/01_METHOD.md` and `rules/02_SLEEVE_RULES.md`. Not "the version you last remember" — *the file's current state.* If the rulebooks have changed since your last execution, act on them as they are now. |
 | 5 | **Sector map** | `input/tracking/sector_map.md` — author­itative ticker → sector, plus bellwether ETF per sector |
 | 6 | **Stop-loss log** | output ledger-style state — existing stop levels on held positions |
@@ -55,7 +55,7 @@ recollection is not.
 - **You own the call** — everything in the checklist below: the macro backdrop
   read, the signal interpretation, the gate-card application, sizing/stops, the required
   sections of the report, the validation checks against the specs in this file and the
-  rulebooks, and the save with the latest.md pointer.
+  rulebooks, and the save.
 - **The Reviewer owns the pre-save check.** It reads what you produce and returns numbered
   defects. You address its defects before re-running.
 
@@ -151,7 +151,7 @@ absent one — it reads as current.
 
 ### 4. Apply gate cards (pick by vehicle FIRST)
 
-**Before applying any gate card, read `output/data/fundamentals_latest.md` (or the dated
+**Before applying any gate card, read `output/data/fundamentals_<date>.md` (or the dated
 CSV behind it) for the fundamentals score and pillar sub-scores for every roster name.**
 Gate 1 requires the composite score and the ACCEL/RECORD tag; gate 2 requires the cash-flow
 pillar. These come from the fundamentals sheet — the provider may be curated, the free `derived` proxy,
@@ -282,7 +282,7 @@ when the underlying flag was computed deterministically upstream:
   line each: allocation, trigger, target date.
 - **EARLY WATCH** — 2-3 names showing early acceleration/analyst upgrades, not held or
   watchlisted. **Do NOT filter candidates by theme** — the radar's ROTATION-IN pillars
-  define *today's* theme. Cross-check `output/radar/latest.md` for radar-only names
+  define *today's* theme. Cross-check `output/radar/Heartbeat_Radar_<date>.md` for radar-only names
   flagged `HEARTBEAT` or `AT-BREAKOUT` — those are the priority candidates.
 - **SWEEP DISCIPLINE** — discovery in `input/tracking/universe.md` is **not
   capped**. The old per-sector cap of 8 belonged to the pre-26-Jul-2026 rotation
@@ -311,8 +311,8 @@ python3 tools/eval_reviewer.py --date <date>
 ```
 
 Exit 0 means zero mechanical defects. **Fix everything it returns and run it again until it
-is clean**, then re-copy `output/latest.md` and re-stamp the sidecar if any gate string
-changed. It takes about 0.15 seconds.
+is clean**, then re-stamp the sidecar if any gate string changed. It takes about
+0.15 seconds.
 
 Re-validate the sidecar in the same breath — it is one more second, and it is the step that
 would have caught the 2026-08-24 `gates[]` regression on the round that caused it:
@@ -367,18 +367,15 @@ Concretely, today's evaluation **must**:
 - End with the required sections from check 7, the `## What changed and why` delta, and
   one brief disclaimer. No disclaimer anywhere else in the body.
 
-Write `output/evaluation_<date>.md`, then refresh the `output/latest.md` copy:
+Write `output/evaluation_<date>.md`. That is the whole save — there is no pointer
+to refresh.
 
-```bash
-cp output/evaluation_<date>.md output/latest.md
-```
-
-> **`output/latest.md` is a plain copy, like every other `latest*.md` in this
-> repo.** Write the dated file first and copy it second — never the other way
-> round, and never write your report *to* `latest.md` and copy it back. It was
-> a symlink until 2026-08-23, when a "sync the pointer" step wrote through it
-> and destroyed `evaluation_2026-08-22.md`; there is no VCS here to recover
-> from. It is a copy now precisely so that getting this wrong costs nothing.
+> **There is no `output/latest.md`.** It was a symlink until 2026-08-23, when a
+> "sync the pointer" step wrote through it and destroyed `evaluation_2026-08-22.md`
+> (a failed `ln -s` had already destroyed `evaluation_2026-08-15.md`); it became a
+> plain copy, and on 2026-08-25 it was removed outright along with every other
+> `latest*.md`. Nothing read them that did not already know the run date. Write the
+> dated file and stop. There is no VCS here to recover from a stray write.
 
 **Then write `output/.state/eval_manifest_<date>.json` — what you assert you did.**
 
@@ -479,14 +476,12 @@ python3 tools/handoff.py --check output/.state/eval_manifest_<date>.json
 ## Hard limits
 
 - **Never edit the watchlist, the ledger, the holdings CSVs, or the Analyst sheet.**
-  These are inputs. *The Trader writes only `output/evaluation_<date>.md`, the
-  `output/.state/eval_manifest_<date>.json` sidecar, and the `output/latest.md`
-  pointer — the last by `cp output/evaluation_<date>.md output/latest.md`,
-  **never by symlink**. A symlink here destroyed two evaluations on 2026-08-15
-  and 2026-08-22 (both now tombstoned; `docs/BACKLOG.md` item 19), and
-  `tools/checks.py --post` FAILs if `latest.md` is a symlink. This line said
-  `ln -sfn` until 2026-08-23 — it was stale contract text instructing the
-  Trader to do the thing the post check rejects.*
+  These are inputs. *The Trader writes exactly two files:
+  `output/evaluation_<date>.md` and the `output/.state/eval_manifest_<date>.json`
+  sidecar. Nothing else — no pointer, no copy. The `latest*.md` pointers this
+  contract used to maintain were removed on 2026-08-25; as symlinks they had
+  destroyed two evaluations (2026-08-15 and 2026-08-22, both now tombstoned;
+  `docs/BACKLOG.md` item 19).*
 - **Never re-fetch fundamentals or facts.** If the Analyst hasn't run today, halt.
 - **Never carry forward yesterday's score or signal.** The Analyst sheet has today's
   data. The rulebooks have today's rules. The radar has today's rotation. If anything
@@ -506,7 +501,7 @@ Return a 2-line status before the saved evaluation:
 TRADER: PASS | PASS WITH DEFECTS | FAIL
 Coverage: N/N (Hh held · Ww wl)
 For every changed call today vs `output/evaluation_<today-1>.md`: list the ticker + delta in
-one line each. Save: output/evaluation_<date>.md  Pointer: output/latest.md
+one line each. Save: output/evaluation_<date>.md
 ```
 
 - **PASS** when every checklist item completed without surfacing a defect.

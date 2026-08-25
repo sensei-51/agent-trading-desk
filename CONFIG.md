@@ -152,7 +152,7 @@ Set in `engine/heartbeat_radar.py`:
 | Tracking (Tier 0 — radar-only, NOT evaluated) | `input/tracking/*.md` | you |
 | Ticker → sector + bellwethers | `input/tracking/sector_map.md` | you |
 | Radar reports | `output/radar/` | generated |
-| Daily evaluations | `output/evaluation_<date>.md` (+ `output/latest.md` pointer) | generated |
+| Daily evaluations | `output/evaluation_<date>.md` | generated |
 | P&L and post-mortems | `output/reports/` | generated |
 | Gate ledger | `output/ledger/Gate_Ledger.csv` | **appended; only today's own `daily-eval` rows are ever rewritten** |
 | Radar / rotation state | `output/.state/` | generated, disposable |
@@ -197,6 +197,7 @@ silently. Full matching tables: [`input/README.md`](input/README.md).
 | Tracking refill | As needed | Append to `input/tracking/universe.md`, drop stale rows. **No per-sector cap** (the 8-cap was retired with the count-based rotation read — bellwether ETFs supply direction). `input/tracking/sector-coverage.md` exists to hold thin sectors at ≥3 members, the floor below which a sector's own cluster needs its bellwether to confirm before an exit reads |
 | P&L + gate scoring | Monthly, first Friday | `python3 tools/pnl.py` |
 
-Both scripts write a dated file **and** update `latest.md` in the same folder.
+Both scripts write one dated file each. There are no `latest*.md` pointers — they
+were removed on 2026-08-25; read the file carrying the date you want.
 
 **Ordering matters:** the radar must run before the evaluation, or the evaluation reads yesterday's flags. If the radar file is more than 3 trading days old, the run must say so and treat the technical leg as stale.

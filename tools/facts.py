@@ -43,7 +43,7 @@ Inputs   input/*.csv           via heartbeat_radar's schema detection
          input/watchlist*.md    via heartbeat_radar's registry parser
          input/tracking/universe.md        only with --include-discovery
 Output   output/data/facts_<date>.csv   machine-readable, one row per roster name
-         output/data/latest.md          the file the evaluation reads
+         output/data/facts_<date>.md    the file the evaluation reads
 
 Usage    python3 tools/facts.py
          python3 tools/facts.py --include-discovery
@@ -611,14 +611,13 @@ def main():
             w.writerow(r)
 
     md = render_md(rows, skipped, demo, a.include_discovery)
-    for p in (os.path.join(a.out_dir, f"facts_{today}.md"),
-              os.path.join(a.out_dir, "latest.md")):
-        with open(p, "w", encoding="utf-8") as f:
-            f.write(md)
+    md_path = os.path.join(a.out_dir, f"facts_{today}.md")
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write(md)
 
     fail = sum(1 for r in rows if r["status"] == "FAIL")
     print(f"Wrote {csv_path}")
-    print(f"Wrote {os.path.join(a.out_dir, 'latest.md')}")
+    print(f"Wrote {md_path}")
     if fail:
         print(f"⛔ {fail} name(s) failed and are listed under FAILURES — "
               f"check these live before writing their calls.", file=sys.stderr)

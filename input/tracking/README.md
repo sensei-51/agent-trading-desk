@@ -41,7 +41,7 @@ screen. The difference is editorial.
 - **Not discovery.** Discovery (the weekly sweep output) belongs in `universe.md` —
   that file is the in-repo noun for ideas that arrive from external research.
 - **Not a watchlist.** The gate card is not run. Stop levels are not set.
-  The radar flag is a single-line entry in `output/radar/latest.md`, not a
+  The radar flag is a single-line entry in `output/radar/Heartbeat_Radar_<date>.md`, not a
   buy recommendation.
 - **Not a sector ETF filer.** Sector coverage is read quorum; entries
   here are "the sector needs these names to read", not "I want exposure".

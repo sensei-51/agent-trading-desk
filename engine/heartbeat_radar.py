@@ -307,7 +307,8 @@ OUTPUT_DIR = os.environ.get("TP_OUTPUT", os.path.join(ROOT, "output"))
 # INPUT AUTO-DETECTION (12 Aug 2026)
 #
 # Nothing in this file needs editing to run. Drop a broker CSV in input/,
-# run the script, read output/radar/latest.md. Column names, Yahoo tickers and
+# run the script, read output/radar/Heartbeat_Radar_<date>.md. Column names,
+# Yahoo tickers and
 # sectors are all worked out at runtime.
 #
 # WHY THIS REPLACED HAND-EDITED CONFIG. The previous version required a new user to
@@ -372,6 +373,12 @@ EXCHANGE_SUFFIX = {
     "TYO": ".T", "TSE-JP": ".T", "HKG": ".HK", "STO": ".ST", "CPH": ".CO", "OSL": ".OL",
     "NASDAQ": "", "NYSE": "", "NYSEARCA": "", "ARCA": "", "AMEX": "", "BATS": "", "OTC": "",
 }
+
+# Dollar symbols that are not the US dollar, longest-prefix first. A broker writes
+# the disambiguating letters and nothing else — "CA$", "A$", "HK$" — so the letters
+# are the entire signal.
+DOLLAR_PREFIXES = (("CA$", "CAD"), ("AU$", "AUD"), ("HK$", "HKD"),
+                   ("NZ$", "NZD"), ("SG$", "SGD"), ("A$", "AUD"), ("S$", "SGD"))
 
 # Sterling markers. GBp (pence) is the LSE quoting convention; a holding priced in it
 # is an LSE line whatever else the export says.
@@ -1148,6 +1155,17 @@ def cell_currency(val):
         return "GBp"
     if "£" in s:
         return "GBP"
+    # PREFIXED DOLLARS BEFORE THE BARE ONE (2026-08-25). "CA$29.87" contains "$",
+    # so the bare test below claimed it as USD and every Canadian line in the book
+    # read as a US line. That is not a cosmetic mislabel: EXPECTED_CUR is built
+    # from this, so the feed check — the one that prints "very likely a DIFFERENT
+    # SECURITY" — compared a CAD holding's USD-quoting namesake against an expected
+    # USD and reported VERIFIED. It is the reason a bare `NEO` row screened
+    # NeoGenomics (US diagnostics, $16.41) under a rare-earth thesis for as long as
+    # it existed, with no warning anywhere in the run.
+    for pre, ccy in DOLLAR_PREFIXES:
+        if pre in s.upper():
+            return ccy
     if "$" in s:
         return "USD"
     if "€" in s:
@@ -1178,6 +1196,30 @@ def row_currency(row, ccol, money_cols=None):
     if "$" in blob:
         return "USD"
     return ""
+
+
+def map_form(sym, smap):
+    """The suffixed spelling of `sym` that sector_map.md lists, if there is exactly one.
+
+    input/README.md calls sector_map.md the override file for ticker resolution —
+    "add a row with the exact ticker you want" — but until 2026-08-25 only the `.L`
+    form was ever consulted, so that promise held for LSE lines and nothing else.
+    Ten `.TO` rows in the shipped map were dead letters: `KNT.TO` was present and
+    correct, and the holding still resolved to bare `KNT`, which is not a listed
+    security, under the basis "assumed US line (unconfirmed)".
+
+    Exactly one, or none. Two suffixed forms of one base are the same self-
+    contradiction as a bare/.L pair and get the same treatment — the map settles
+    nothing, so it is not consulted. `checks.py --pre` fails on it separately.
+    """
+    hits = [k for k in smap
+            if k.startswith(sym + ".") and "." not in k[len(sym) + 1:]]
+    return hits[0] if len(hits) == 1 else None
+
+
+def map_sector(sym, smap):
+    """sector_map.md's sector for a broker symbol, in whichever form the map lists it."""
+    return smap.get(sym) or smap.get(map_form(sym, smap) or "")
 
 
 def resolve_ticker(sym, name, currency, smap):
@@ -1215,19 +1257,23 @@ def resolve_ticker(sym, name, currency, smap):
     # the ambiguity gets removed rather than tolerated, and the feed check downstream
     # is the backstop for whichever form is picked here.
     fam = cur_family(currency)
-    bare_in, dotl_in = sym in smap, (sym + ".L") in smap
-    if bare_in and dotl_in:
-        pick = sym + ".L" if fam == "GBP" else sym
-        other = sym if pick.endswith(".L") else sym + ".L"
+    bare_in, suf = sym in smap, map_form(sym, smap)
+    if bare_in and suf:
+        # The tiebreak was "GBP-priced picks .L, everything else picks bare". That
+        # generalises without a suffix-to-currency table: a bare Yahoo ticker IS the
+        # US listing, so a row priced in anything else is not the bare form. Same
+        # answer as before for the GBP/.L case that prompted it.
+        pick = suf if fam and fam != "USD" else sym
+        other = sym if pick == suf else suf
         record_forms(pick, other, sym, currency)
-        return pick, (f"sector_map.md AMBIGUOUS (lists {sym} and {sym}.L) — "
+        return pick, (f"sector_map.md AMBIGUOUS (lists {sym} and {suf}) — "
                       f"{fam or 'no'}-priced row picked {pick}")
     if bare_in:
-        record_forms(sym, sym + ".L", sym, currency)
+        record_forms(sym, suf or sym + ".L", sym, currency)
         return sym, "sector_map.md"
-    if dotl_in:
-        record_forms(sym + ".L", sym, sym, currency)
-        return sym + ".L", "sector_map.md (.L form)"
+    if suf:
+        record_forms(suf, sym, sym, currency)
+        return suf, f"sector_map.md ({suf[len(sym):]} form)"
 
     # 5. Priced in sterling => LSE line.
     if any(g in (currency or "").upper() for g in GBP_MARKERS):
@@ -1360,6 +1406,24 @@ def discover_watchlist_files():
     return real or candidates
 
 
+def discover_tracking_files(track_dir):
+    """Tier-0 tracking files: every *.md in input/tracking/ that carries ticker rows.
+
+    Same `.example.md` rule the watchlist and holdings paths use — a shipped starter
+    list is a fallback, never an addition. Without it, `universe.example.md` would
+    load ALONGSIDE a real universe.md and quietly pad the screened universe with
+    names the user never chose.
+
+    README.md is a workflow doc and sector_map.md is the classification dictionary;
+    neither is a ticker pool, and reading sector_map.md as one would enter every
+    mapping in the file as a tracking name.
+    """
+    cand = [p for p in sorted(glob.glob(os.path.join(track_dir, "*.md")))
+            if os.path.basename(p) not in ("README.md", "sector_map.md")]
+    real = [p for p in cand if not os.path.basename(p).lower().endswith(".example.md")]
+    return real or cand
+
+
 def load_watchlists(here=None, smap=None):
     """Watchlist candidates to screen: [(yahoo_ticker, source_file, is_speculative)].
 
@@ -1373,8 +1437,10 @@ def load_watchlists(here=None, smap=None):
 
     Files are discovered by globbing `input/watchlist*.md` at the top
     level of `input/` — no subdirectory, no list to maintain in code.
-    The suffix is decided per row rather than per file: a bare symbol whose .L form
-    appears in sector_map.md takes the suffix. Getting this wrong double-counts a name
+    The suffix is decided per row rather than per file: a bare symbol whose suffixed
+    form appears in sector_map.md takes that suffix (any suffix — this read `.L` only
+    until 2026-08-25, which is why `NEO`, a TSX line the map already carried as
+    `NEO.TO`, screened as US-listed NeoGenomics instead). Getting this wrong double-counts a name
     in the rotation read, once bare and once as the held .L line, which is why the
     per-file "this sleeve is LSE" flag was a poor instrument for the job — a mixed
     watchlist has no single answer.
@@ -1401,8 +1467,8 @@ def load_watchlists(here=None, smap=None):
                         continue
                     moon = section_moon or "SPECULATIVE" in line.upper()
                     tk = m.group(1)
-                    if tk not in smap and (tk + ".L") in smap:
-                        tk += ".L"
+                    if tk not in smap:
+                        tk = map_form(tk, smap) or tk
                     out.append((tk, fname, moon))
         except (OSError, UnicodeDecodeError) as e:
             # DATA PATH — narrow, and say so. This used to be `except Exception:
@@ -2401,8 +2467,6 @@ def main():
                      help="Report path. Default: <output-dir>/radar/Heartbeat_Radar_<date>.md")
     ap.add_argument("--state", default=None,
                      help="Daily flag state. Default: <output-dir>/.state/radar_state.json")
-    ap.add_argument("--no-latest", action="store_true",
-                     help="Skip writing the latest.md pointer.")
     ap.add_argument("--snapshot", default=None,
                      help="Dated per-ticker numeric snapshot. Default: "
                           "<output-dir>/.state/radar_snapshot_<date>.json")
@@ -2487,20 +2551,21 @@ def main():
     # Any extra tracking/*.md file gets the same treatment. The Sector column is
     # honoured as a fallback when sector_map.md doesn't carry the ticker.
     track_dir = a.tracking_dir or os.path.join(INPUT_DIR, "tracking")
-    track_glob = sorted(glob.glob(os.path.join(track_dir, "*.md")))
+    track_glob = discover_tracking_files(track_dir)
     if not track_glob:
         print("[tracking] WARN: input/tracking/ has no .md files. Tier 0 is empty.")
     for tf in track_glob:
-        bn = os.path.basename(tf)
-        if bn == "README.md":
-            continue  # workflow doc, no data rows
-        if bn == "sector_map.md":
-            continue  # classification dictionary — read by load_sector_map(),
-                      # not a ticker pool. Otherwise its rows count as tracking.
         for cells in md_table_rows(tf):
             tk = cells[0]
             if not re.fullmatch(r"[A-Z0-9][A-Z0-9.\-]{0,9}", tk):
                 continue
+            # Same suffix rule the holdings and watchlist paths use: a bare row whose
+            # suffixed form the map carries takes that suffix. Tracking rows had no
+            # rule at all and were taken verbatim, so `| NEO |` screened US-listed
+            # NeoGenomics ($16.41) while `NEO.TO`, the TSX rare-earth line the row is
+            # actually about (CA$33.21), sat in the map unread.
+            if tk not in smap:
+                tk = map_form(tk, smap) or tk
             sec = cells[1].lstrip("@") if len(cells) >= 2 and cells[1] else None
             if sec:
                 inline[tk] = sec
@@ -3535,26 +3600,6 @@ def main():
     with open(outfile, "w") as f:
         f.write("\n".join(L))
 
-    # latest.md always carries the newest run. The daily evaluation reads this rather
-    # than globbing for the most recent date, so it can never silently pick up a stale
-    # file when a run fails -- a stale pointer is at least visibly stale via the header
-    # date inside it.
-    #
-    # IT IS A PLAIN COPY, NOT A SYMLINK, and deliberately so. This used to try a symlink
-    # first and fall back to a copy, which meant the contract was already "either is
-    # fine". A symlink is the worse half: writing *to* the pointer follows the link and
-    # overwrites the dated file behind it. On 2026-08-23 that destroyed two evaluations
-    # via output/latest.md (docs/BACKLOG.md item 19). Overwriting a copy costs nothing.
-    if not a.no_latest:
-        latest = os.path.join(os.path.dirname(os.path.abspath(outfile)), "latest.md")
-        try:
-            if os.path.islink(latest):
-                os.remove(latest)            # migrate an older symlinked pointer
-            with open(latest, "w") as f:
-                f.write("\n".join(L))
-        except OSError:
-            pass
-
     # Rotate before overwrite. A state file from an EARLIER day is the only
     # honest "previous day" baseline there is; once this run overwrites it, a
     # second run today has nothing to diff against. Keep a copy. Failure here is
@@ -3632,8 +3677,6 @@ def main():
 
     hb = sum(1 for r in rows if "HEARTBEAT" in r["flags"])
     print(f"written: {outfile}")
-    if not a.no_latest:
-        print(f"  latest: {os.path.join(os.path.dirname(os.path.abspath(outfile)), 'latest.md')}")
     print(f"  {len(rows)} rows · {hb} heartbeat · {len(too_new)} too new · {len(errs)} errors")
     if snap_note:
         print(snap_note)

@@ -53,7 +53,7 @@
 <text x="269.0" y="348" font-size="9.5" fill="#1F2328">price · 52w high · YTD</text>
 <text x="269.0" y="362" font-size="9.5" fill="#1F2328">consensus PT · earnings</text>
 <text x="269.0" y="376" font-size="9.5" fill="#1F2328">five arithmetic flags</text>
-<text x="269.0" y="404" font-size="9" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ output/data/latest.md</text>
+<text x="269.0" y="404" font-size="9" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ output/data/facts_&lt;date&gt;.md</text>
 <path d="M246.5 347L251.5 353L246.5 359" fill="none" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
 <rect x="442.0" y="292" width="171.0" height="122" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
 <text x="454.0" y="310" font-size="10.5" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">tools/fundamentals.py</text>
@@ -62,7 +62,7 @@
 <text x="454.0" y="348" font-size="9.5" fill="#1F2328">composite /100 + pillars</text>
 <text x="454.0" y="362" font-size="9.5" fill="#1F2328">ACCEL / RECORD tagging</text>
 <text x="454.0" y="376" font-size="9.5" fill="#1F2328">provider from config</text>
-<text x="454.0" y="404" font-size="9" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ data/fundamentals_latest.md</text>
+<text x="454.0" y="404" font-size="9" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ data/fundamentals_&lt;date&gt;.md</text>
 <path d="M431.5 347L436.5 353L431.5 359" fill="none" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
 <rect x="627.0" y="292" width="171.0" height="122" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
 <text x="639.0" y="310" font-size="10.5" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">tools/flow.py</text>
@@ -71,7 +71,7 @@
 <text x="639.0" y="348" font-size="9.5" fill="#1F2328">dark-pool flow + conviction</text>
 <text x="639.0" y="362" font-size="9.5" fill="#1F2328">THIN below the size floor</text>
 <text x="639.0" y="376" font-size="9.5" fill="#1F2328">no gate consults it yet</text>
-<text x="639.0" y="404" font-size="9" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ data/flow_latest.md</text>
+<text x="639.0" y="404" font-size="9" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ data/flow_&lt;date&gt;.md</text>
 <path d="M616.5 347L621.5 353L616.5 359" fill="none" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
 <rect x="812.0" y="292" width="171.0" height="122" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
 <text x="824.0" y="310" font-size="10.5" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">tools/xray.py</text>
@@ -80,7 +80,7 @@
 <text x="824.0" y="348" font-size="9.5" fill="#1F2328">NAV on the broker's FX</text>
 <text x="824.0" y="362" font-size="9.5" fill="#1F2328">value + % NAV per sector</text>
 <text x="824.0" y="376" font-size="9.5" fill="#1F2328">NAV history + chart</text>
-<text x="824.0" y="404" font-size="9" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ data/xray_latest.md</text>
+<text x="824.0" y="404" font-size="9" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">→ data/xray_&lt;date&gt;.md</text>
 <path d="M801.5 347L806.5 353L801.5 359" fill="none" stroke="#8C959F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
 <rect x="997.0" y="292" width="171.0" height="122" rx="8" fill="#FFFFFF" stroke="#C6D0E0" stroke-width="1"/>
 <text x="1009.0" y="310" font-size="10.5" fill="#3D4C63" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">tools/checks.py</text>
@@ -165,7 +165,6 @@
 <text x="85.0" y="832" font-size="8.5" fill="#8C959F" font-weight="600" letter-spacing="0.8">THE DELIVERABLE</text>
 <text x="85.0" y="850" font-size="9.5" fill="#57606A">one explicit signal per roster name,</text>
 <text x="85.0" y="863" font-size="9.5" fill="#57606A">every actionable call with a level</text>
-<text x="85.0" y="876" font-size="9.5" fill="#57606A">pointer: output/latest.md</text>
 <rect x="350.0" y="800" width="262.0" height="100" rx="8" fill="#FFFFFF" stroke="#A9D5D9" stroke-width="1"/>
 <text x="363.0" y="818" font-size="10.5" fill="#9A6100" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">output/ledger/Gate_Ledger.csv</text>
 <text x="363.0" y="832" font-size="8.5" fill="#8C959F" font-weight="600" letter-spacing="0.8">THE DURABLE RECORD</text>
@@ -176,7 +175,7 @@
 <text x="641.0" y="818" font-size="10.5" fill="#0C6B75" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">output/radar/ · output/data/</text>
 <text x="641.0" y="832" font-size="8.5" fill="#8C959F" font-weight="600" letter-spacing="0.8">THE LOOKUPS</text>
 <text x="641.0" y="850" font-size="9.5" fill="#57606A">regenerated every run and safe to</text>
-<text x="641.0" y="863" font-size="9.5" fill="#57606A">delete; each folder keeps a latest.md</text>
+<text x="641.0" y="863" font-size="9.5" fill="#57606A">delete; every file carries its date</text>
 <text x="641.0" y="876" font-size="9.5" fill="#57606A">nothing is recorded only here</text>
 <rect x="906.0" y="800" width="262.0" height="100" rx="8" fill="#FFFFFF" stroke="#A9D5D9" stroke-width="1"/>
 <text x="919.0" y="818" font-size="10.5" fill="#0C6B75" font-weight="600" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">output/.state/</text>

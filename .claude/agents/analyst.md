@@ -30,10 +30,10 @@ defect you can ship: the gate card's decision on the wrong number silently recol
 |---|---|
 | Source config | `input/config/providers.json` — one `{provider, fallback}` per leg (`fundamentals`, `flow`, `conviction`) |
 | Roster (`hr` loader) | `engine/heartbeat_radar.py` — `hr.load_roster`, `hr.load_watchlists`, `hr.load_sector_map`, `hr.INPUT_DIR`, `hr.OUTPUT_DIR` |
-| Facts script | `tools/facts.py` — writes `output/data/facts_<date>.csv` + `output/data/latest.md` |
-| Fundamentals script | `tools/fundamentals.py` — writes `output/data/fundamentals_<date>.csv` + `output/data/fundamentals_latest.md` |
-| X-ray sheet | `output/data/xray_latest.md` — produced by `tools/xray.py` |
-| Radar | `output/radar/latest.md` + `engine/heartbeat_radar.py` |
+| Facts script | `tools/facts.py` — writes `output/data/facts_<date>.csv` + `output/data/facts_<date>.md` |
+| Fundamentals script | `tools/fundamentals.py` — writes `output/data/fundamentals_<date>.csv` + `output/data/fundamentals_<date>.md` |
+| X-ray sheet | `output/data/xray_<date>.md` — produced by `tools/xray.py` |
+| Radar | `output/radar/Heartbeat_Radar_<date>.md` + `engine/heartbeat_radar.py` |
 | Source contract | `docs/DATA_SOURCES.md` |
 | Sector map | `input/tracking/sector_map.md` |
 | Config template (publish-safe) | `input/config/providers.json.example` ships every leg on `"none"` |
@@ -65,8 +65,8 @@ one way this saves time and costs you accuracy at once.
 
 | Command | What it writes | What its `Coverage:` line must say |
 |---|---|---|
-| `python3 tools/facts.py` | `output/data/facts_<date>.csv` + `output/data/latest.md` | one line per roster name (held + watchlists), with `n OK / n PARTIAL / n FAIL` |
-| `python3 tools/fundamentals.py` | `output/data/fundamentals_<date>.csv` + `output/data/fundamentals_latest.md` | one line per roster name, with `n OK / n PARTIAL / n FAIL / n NONE` |
+| `python3 tools/facts.py` | `output/data/facts_<date>.csv` + `output/data/facts_<date>.md` | one line per roster name (held + watchlists), with `n OK / n PARTIAL / n FAIL` |
+| `python3 tools/fundamentals.py` | `output/data/fundamentals_<date>.csv` + `output/data/fundamentals_<date>.md` | one line per roster name, with `n OK / n PARTIAL / n FAIL / n NONE` |
 
 - The `none` provider must produce `n OK = 0` and `n NONE = roster-size`. Anything else means the
   script ran a different provider than the config names — fix before continuing.
@@ -74,7 +74,7 @@ one way this saves time and costs you accuracy at once.
   source from the primary and the header says `MIXED RUN` when that happened.
 - A curated provider should leave only `FAIL` rows for ETF tickers (London `.L` funds) and
   genuine corporate layout drift. Use it; don't fight it.
-- Adjacent: `python3 tools/xray.py` writes `xray_latest.md` — verify it ran **yesterday** or
+- Adjacent: `python3 tools/xray.py` writes `xray_<date>.md` — verify it ran **yesterday** or
   earlier today. If older, run it now. The Trader embeds it in the report unchanged.
 
 ### 3. Resolve FAIL / PARTIAL / NONE rows
@@ -102,7 +102,7 @@ There is no script for it.
 
 - If the user has a Quant / the conviction feed / equivalent feed: read the regime signal **live**, today, with
   timestamp. Read the model portfolio and **the change list since last run.**
-  Note direction and size of every weight change against `output/xray_latest.md`'s actual NAV per
+  Note direction and size of every weight change against `output/data/xray_<date>.md`'s actual NAV per
   sector. Date both readings.
 - If there is no such feed: write `CONVICTION: none` into the analyst sheet and **do not invent
   a weight**. The Trader's `EXTENDED` test in the report then falls back to "up >15% from cost
@@ -113,7 +113,7 @@ There is no script for it.
 
 ### 5. Macro + theme news
 
-For **each active theme** named in `output/radar/latest.md`'s `## Rotation read` block, do *one*
+For **each active theme** named in `output/radar/Heartbeat_Radar_<date>.md`'s `## Rotation read` block, do *one*
 targeted web search and capture the topmost current item into the analyst sheet under
 `## Theme news`. This is the blanket that closes the "geopolitical details on Hormuz transit,
 ADNOC attack timing, US–Iran MoU expiry, and China PBOC gold-buying streak NOT re-fetched this run"
@@ -136,8 +136,8 @@ report).
 | Analyst live fixes | this run | live | count, names |
 | Conviction | optional source — `none` is honest | OK / **⚫ ABSENT** | date if OK |
 | Macro + theme news | per active theme | OK | one item per theme, dated |
-| Facts | `tools/facts.py` | OK / FAIL | `n OK / n PARTIAL / n FAIL` from `facts_latest.md` |
-| X-ray | `tools/xray.py` | OK / stale | date of `xray_latest.md` |
+| Facts | `tools/facts.py` | OK / FAIL | `n OK / n PARTIAL / n FAIL` from `facts_<date>.md` |
+| X-ray | `tools/xray.py` | OK / stale | date of `xray_<date>.md` |
 | Radar | `engine/heartbeat_radar.py` | manifest verdict verbatim | `FRESH` / `STALE(ntd)` from `run_manifest.json` — never re-derived |
 
 **An absent leg is ⚫ ABSENT, never ✅.** `conviction ✅ (none)` is a contradiction — a

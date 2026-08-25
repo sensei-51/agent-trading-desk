@@ -1,6 +1,6 @@
 ---
 name: manager
-description: Adversarial pre-save check on a drafted daily evaluation. Verifies the report against the roster contract, the facts sheet, the sector X-ray and the structural rules of rules/03_DAILY_RUN.md. Use after the evaluation is drafted and before it is written to output/evaluation_<date>.md (pointer: output/latest.md). Returns a PASS/FAIL verdict with numbered defects and evidence — never edits the report.
+description: Adversarial pre-save check on a drafted daily evaluation. Verifies the report against the roster contract, the facts sheet, the sector X-ray and the structural rules of rules/03_DAILY_RUN.md. Use after the evaluation is drafted and before it is written to output/evaluation_<date>.md. Returns a PASS/FAIL verdict with numbered defects and evidence — never edits the report.
 mode: subagent
 permission:
   edit: deny
@@ -29,10 +29,10 @@ format requires — those are yours.
 
 | What | Where |
 |---|---|
-| The draft report | Path given to you in the prompt (often a scratch file, not the saved `output/latest.md` yet) |
-| Facts sheet | `output/data/latest.md` and `output/data/facts_<date>.csv` |
-| Sector X-ray | `output/data/xray_latest.md` |
-| Radar | `output/radar/latest.md` |
+| The draft report | Path given to you in the prompt (often a scratch file, not the saved `output/evaluation_<date>.md` yet) |
+| Facts sheet | `output/data/facts_<date>.md` and `output/data/facts_<date>.csv` |
+| Sector X-ray | `output/data/xray_<date>.md` |
+| Radar | `output/radar/Heartbeat_Radar_<date>.md` |
 | Holdings | `input/*.csv` |
 | Watchlist | `input/watchlist.md` (or `watchlist_*.md` for splits) |
 
@@ -213,9 +213,9 @@ must not look the same in your output.
     the end, none in the body.
 
 16. **Sector X-ray present and verbatim.** The report must carry a `## Sector X-ray`
-    section dated today, with its NAV total matching `output/data/xray_latest.md`
+    section dated today, with its NAV total matching `output/data/xray_<date>.md`
     (spot-check the total and one or two sector rows against the X-ray file). **The
-    sector weights table must be copied verbatim from `xray_latest.md` — no added rows
+    sector weights table must be copied verbatim from `xray_<date>.md` — no added rows
     (e.g. fabricated sectors from watchlist data), no removed rows, no reordered rows.**
     The X-ray tool computes weights from holdings only; watchlist names have no NAV weight.
     A fabricated row, missing row, or mismatched figure is **FAIL**.

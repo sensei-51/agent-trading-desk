@@ -5,7 +5,7 @@ flow.py — the flow and conviction legs, rendered for the agents to read.
 WHAT THIS STEP DOES AND DELIBERATELY DOES NOT DO
   It reads the two whole-book legs (`flow`, `conviction`) from whichever
   providers `input/config/providers.json` names, and writes them to
-  `output/data/flow_<date>.md` + `flow_latest.md`.
+  `output/data/flow_<date>.md`.
 
   It changes **no gate, no cap, no signal and no tag**. Nothing in the Trader's
   card reads this file yet. That is the point: the legs start producing data,
@@ -36,7 +36,7 @@ Inputs   input/config/providers.json        provider selection, per leg
          input/capture/conviction_<date>.md
          input/*.csv                        broker export, to mark held names
 Output   output/data/flow_<date>.md
-         output/data/flow_latest.md         the file the agents read
+         output/data/flow_<date>.md         the file the agents read
 
 Usage    python3 tools/flow.py
          python3 tools/flow.py --list-providers
@@ -285,10 +285,8 @@ def main():
     os.makedirs(a.out_dir, exist_ok=True)
     today = datetime.date.today().isoformat()
     dated = os.path.join(a.out_dir, f"flow_{today}.md")
-    latest = os.path.join(a.out_dir, "flow_latest.md")
-    for p in (dated, latest):
-        with open(p, "w", encoding="utf-8") as f:
-            f.write(text)
+    with open(dated, "w", encoding="utf-8") as f:
+        f.write(text)
 
     fs = (flow or {}).get("status", "NONE")
     cs = (conv or {}).get("status", "NONE")
@@ -296,7 +294,7 @@ def main():
           f"tickers={len((flow or {}).get('tickers') or {})}")
     for w in warnings:
         print(f"  ⚠️  {w}")
-    print(f"Wrote {os.path.relpath(latest, ROOT)}")
+    print(f"Wrote {os.path.relpath(dated, ROOT)}")
     # A configured-but-absent leg is a normal published state, not a failure.
     # Only a broken provider is worth halting the pipeline for.
     return 1 if any("contract violation" in w or "raised" in w for w in warnings) else 0

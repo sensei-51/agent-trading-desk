@@ -10,6 +10,8 @@ input/watchlist.md
 input/watchlist_*.md
 # your real positions, scaled by tools/anonymise.py — allowed through:
 !input/*.public.csv
+# the bundled demo book, used only when no real export is present — allowed through:
+!input/*.example.csv
 
 # ── Local source config stays local ─────────────────────────────────
 # The repo ships input/config/fundamentals.json.example with the publish-safe

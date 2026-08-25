@@ -34,7 +34,7 @@ Checks
              broker row — see check_ticker_identity),
              bloc ceiling ≤ 25% NAV per sector (warn ≥ 90% of cap),
              per-line ≥ 90% of the 5% cap surfaced,
-             xray_latest NAV == broker CSV sum,
+             xray_<date> NAV == broker CSV sum,
              radar age (machine verdict: FRESH / STALE(n))
              status-table honesty (✅ on an absent leg = fail),
              ledger or pending file touched for today's evaluation
@@ -126,7 +126,7 @@ def load_holdings():
             val, sterling = hr.parse_pounds(row.get(vcol))
             if val is None or not sterling:
                 continue
-            sec = smap.get(sym) or smap.get(sym + ".L") or "Unclassified"
+            sec = hr.map_sector(sym, smap) or "Unclassified"
             rows.append((sym, val, sec))
     return rows, sum(v for _, v, _ in rows), unreadable
 
@@ -156,8 +156,8 @@ def check_sector_map_dupes():
 
 
 def check_sector_map_ambiguous():
-    """A symbol listed in BOTH bare and .L form makes the map unable to answer the
-    question it exists to answer, and the two forms are routinely different
+    """A symbol listed in BOTH bare and suffixed form makes the map unable to answer
+    the question it exists to answer, and the two forms are routinely different
     securities on different exchanges.
 
     This is the check that would have caught the 16 Aug 2026 GIGB report. The map
@@ -175,13 +175,20 @@ def check_sector_map_ambiguous():
     if not os.path.exists(path):
         return FAIL, "sector_map.md missing"
     smap = hr.load_sector_map()
-    pairs = sorted(t for t in smap if t + ".L" in smap)
+    # ANY suffix, not just .L (2026-08-25). This read `t + ".L" in smap` while
+    # resolve_ticker read the same two forms, so the check covered exactly what
+    # resolution could see. Both now honour whatever suffix the map carries, and a
+    # check narrower than the resolver it guards is the shape of the original bug:
+    # `NEO` and `NEO.TO` sat in the shipped map reporting a clean pass, and the
+    # radar screened NeoGenomics under a rare-earth thesis on the strength of it.
+    pairs = sorted((t, hr.map_form(t, smap)) for t in smap
+                   if "." not in t and hr.map_form(t, smap))
     if pairs:
         return FAIL, ("sector_map.md lists both forms of: "
-                      + ", ".join(f"{t}/{t}.L" for t in pairs)
+                      + ", ".join(f"{t}/{s}" for t, s in pairs)
                       + " — keep only the Yahoo ticker you actually hold, or the "
                         "radar can screen the wrong security under the right symbol")
-    return OK, f"no bare/.L collisions across {len(smap)} mappings"
+    return OK, f"no bare/suffixed collisions across {len(smap)} mappings"
 
 
 def check_ticker_identity():
@@ -439,12 +446,12 @@ def check_line_caps():
 
 def check_nav_consistency():
     _, total, _ = load_holdings()
-    path = os.path.join(OUTPUT_DIR, "data", "xray_latest.md")
+    path = os.path.join(OUTPUT_DIR, "data", f"xray_{today()}.md")
     if not os.path.exists(path):
-        return SKIP, "no xray_latest.md"
+        return SKIP, f"no xray_{today()}.md"
     m = re.search(r"NAV £([\d,]+)", open(path, encoding="utf-8").read())
     if not m:
-        return FAIL, "xray_latest.md carries no NAV line"
+        return FAIL, f"xray_{today()}.md carries no NAV line"
     xnav = float(m.group(1).replace(",", ""))
     if abs(xnav - total) > max(1.0, total * 0.001):
         return FAIL, (f"xray NAV £{xnav:,.0f} ≠ broker CSV sum £{total:,.0f} "
@@ -528,16 +535,10 @@ def check_status_honesty():
     """A green check on an absent leg is the 'silent gap' DATA_SOURCES rule 3
     prohibits — observed 2026-08-18: 'conviction ✅ (none — no feed)'."""
     hits = []
-    for path in (os.path.join(OUTPUT_DIR, "latest.md"),
-                 os.path.join(OUTPUT_DIR, f"evaluation_{today()}.md")):
-        real = path
-        if os.path.exists(path) and os.path.getsize(path) < 200:
-            ptr = open(path, encoding="utf-8").read().strip()
-            cand = os.path.join(ROOT, ptr)
-            real = cand if os.path.exists(cand) else path
-        if not os.path.exists(real):
+    for path in (os.path.join(OUTPUT_DIR, f"evaluation_{today()}.md"),):
+        if not os.path.exists(path):
             continue
-        body = open(real, encoding="utf-8").read()
+        body = open(path, encoding="utf-8").read()
         for m in re.finditer(r"(\w[\w\s-]{0,24})✅\s*\(\s*(?:none|absent|no)\b[^)]*\)",
                              body, re.I):
             hits.append(m.group(0).strip())
@@ -610,9 +611,37 @@ def check_universe_size():
                 f"({cur - prev:+d})")
 
 
-def check_eval_pointer():
-    """`output/latest.md` is a fresh copy of today's evaluation, and nothing has
-    been written over a dated evaluation.
+def h1_dates(head):
+    """Every date an evaluation's H1 states, normalised to YYYY-MM-DD.
+
+    Three spellings, because the H1 is written by an agent from a template and the
+    exact wording has never been contractual — only the date it carries is. The
+    corpus uses the prose form ("— Monday 24 August 2026"); the template asks for
+    ISO ("— 2026-08-25"); both are unambiguous and both are accepted.
+
+    This replaces a `day in head and month in head and year in head` substring test
+    (2026-08-25). That test failed every ISO H1 — "August" appears nowhere in
+    "2026-08-25" — which is how a reviewed, ledger-written evaluation came to trip
+    a ⛔ on nothing but its own date format. It was also weak in the other
+    direction: the day matched on any stray "25" anywhere in the line, so three
+    incidental substrings could clear a date that was never actually stated.
+    """
+    out = set()
+    for m in re.finditer(r"\b\d{4}-\d{2}-\d{2}\b", head):
+        out.add(m.group(0))
+    for pat, fmt in ((r"\b(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})\b", "%d %B %Y"),
+                     (r"\b([A-Za-z]{3,9})\s+(\d{1,2}),?\s+(\d{4})\b", "%B %d %Y")):
+        for m in re.finditer(pat, head):
+            try:
+                d = datetime.datetime.strptime(" ".join(m.groups()), fmt)
+            except ValueError:
+                continue
+            out.add(d.strftime("%Y-%m-%d"))
+    return out
+
+
+def check_eval_dates():
+    """No dated evaluation carries somebody else's date in its H1.
 
     WHY THIS EXISTS. `output/latest.md` used to be a symlink. An agent told to
     "sync the pointer" wrote a file *to* that path; the write followed the link
@@ -620,29 +649,14 @@ def check_eval_pointer():
     `evaluation_2026-08-22.md`, and a failed `ln -s` had already destroyed
     `evaluation_2026-08-15.md` on the 18th. There is no VCS here.
 
-    All six `latest*.md` pointers are now plain copies (`facts.py`, `xray.py`,
-    `fundamentals.py` and `flow.py` always were), so writing to one costs
-    nothing. That removes the failure mode rather than guarding it, and leaves
-    this check two cheap things to confirm: the copy is today's, and no dated
-    evaluation carries somebody else's date in its H1.
+    The pointers were retired outright on 2026-08-25 rather than kept as copies:
+    nothing read them programmatically, every consumer knows the run date, and a
+    file whose whole job is to duplicate another is one more thing a run can get
+    wrong. What survives is the half that was never about the pointer — an
+    evaluation whose H1 date is not its filename date has been written over, and
+    that is worth catching however the write arrived.
     """
-    ptr = os.path.join(OUTPUT_DIR, "latest.md")
-    eval_today = os.path.join(OUTPUT_DIR, f"evaluation_{today()}.md")
     problems, historic = [], []
-
-    if os.path.islink(ptr):
-        problems.append("output/latest.md is a symlink — it must be a plain copy, "
-                        "because a write to a symlinked pointer destroys the "
-                        "evaluation behind it. Replace it with "
-                        f"`cp evaluation_{today()}.md output/latest.md`")
-    elif os.path.exists(eval_today):
-        if not os.path.exists(ptr):
-            problems.append("output/latest.md is missing but today's evaluation "
-                            f"exists — `cp evaluation_{today()}.md output/latest.md`")
-        elif (open(ptr, encoding="utf-8").read()
-              != open(eval_today, encoding="utf-8").read()):
-            problems.append("output/latest.md does not match today's evaluation "
-                            f"— `cp evaluation_{today()}.md output/latest.md`")
 
     # An evaluation whose H1 date is not its filename date has been written over.
     for name in sorted(os.listdir(OUTPUT_DIR)):
@@ -661,9 +675,10 @@ def check_eval_pointer():
             d = datetime.datetime.strptime(stamped, "%Y-%m-%d")
         except ValueError:
             continue
-        # H1 reads e.g. "# Trading Sleeve Evaluation — Sunday 23 August 2026"
-        day, month, year = str(int(d.strftime("%d"))), d.strftime("%B"), d.strftime("%Y")
-        if head.strip() and not (day in head and month in head and year in head):
+        # H1 reads e.g. "# Trading Sleeve Evaluation — Sunday 23 August 2026", or
+        # the template's "# <Sleeve> Evaluation — 2026-08-25". Either states a date;
+        # the only question this check asks is whether it is THIS file's date.
+        if head.strip() and stamped not in h1_dates(head):
             msg = (f"{name} carries an H1 that is not its own date "
                    f"({head.strip()[:60]!r}) — it was probably overwritten")
             (problems if stamped == today() else historic).append(msg)
@@ -678,8 +693,7 @@ def check_eval_pointer():
         return WARN, (f"{len(historic)} evaluation(s) overwritten in the past "
                       f"(unrecoverable; tombstone the file to silence): "
                       + " · ".join(historic))
-    return OK, ("output/latest.md is a plain copy of today's evaluation; every "
-                "dated evaluation carries its own date")
+    return OK, "every dated evaluation carries its own date"
 
 
 def check_ledger_touched():
@@ -702,8 +716,18 @@ def check_ledger_touched():
 
 def check_publish_leaks():
     _, total, _ = load_holdings()
+    demo = hr.discover_holdings_files()[1]
     if not total:
         return SKIP, "no holdings to derive leak strings from"
+    # A demo book has no real NAV to leak, and its total is £100,000 — the nominal
+    # sleeve CONFIG.md, DISCLAIMER.md and the rules files quote on nearly every
+    # page. Sweeping for it reports every one of those as a breach. This is the
+    # same reasoning `_add_needle` in tools/publish.py applies to round figures:
+    # a worked example is not a secret, and a gate that fires on one is a gate
+    # nobody reads. The discriminator is the roster itself, not the number —
+    # raise the nominal to £250,000 and this still holds.
+    if demo:
+        return SKIP, "running on the demo book — no real NAV to sweep for"
     needles = {f"{total:,.0f}", f"{total:,.2f}", f"{total:.0f}"}
     # `.rerun` is skipped in the PRIVATE tree only (2026-08-23). Sandboxes there
     # are gitignored copies of `output/` and carry the real NAV by design, so
@@ -820,7 +844,7 @@ SUITES = {
              ("radar snapshot", check_radar_snapshot),
              ("universe size", check_universe_size),
              ("status honesty", check_status_honesty),
-             ("eval pointer", check_eval_pointer),
+             ("eval dates", check_eval_dates),
              ("ledger touched", check_ledger_touched)],
     "publish": [("private providers", check_no_private_providers),
                 ("leak sweep", check_publish_leaks),

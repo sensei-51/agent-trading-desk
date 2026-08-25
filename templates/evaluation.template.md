@@ -1,4 +1,11 @@
-# <Sleeve> Evaluation — YYYY-MM-DD
+# <Sleeve> Evaluation — <Weekday> D Month YYYY
+
+<!-- The date in this H1 must be THIS run's date: `checks.py --post` reads it to
+     catch an evaluation that has been written over by another day's content, the
+     way evaluation_2026-08-15.md and evaluation_2026-08-22.md were destroyed. The
+     prose form above is what every evaluation in output/ uses; a plain ISO
+     `2026-08-25` is accepted too. A run number in brackets — "(run 2)" — is
+     conventional on same-day repeats. -->
 
 *Overwritten every run. **All evaluation state lives here** — never in the watchlist or the rules files.*
 
@@ -72,7 +79,7 @@ Top 1–2 active risks. Each rated **STABLE / ELEVATED / CRITICAL**, with the di
 
 ---
 
-## Sector X-ray (verbatim from `output/data/xray_latest.md`)
+## Sector X-ray (verbatim from `output/data/xray_<date>.md`)
 
 **NAV £<N>** over <H> holdings *(broker export dated YYYY-MM-DD — values are that day's, not today's).* Value is the broker's own sterling conversion per line (`Market Value £`). Sector mapping: `input/tracking/sector_map.md`. **Each █ = 1% of NAV** (bar width 30).
 

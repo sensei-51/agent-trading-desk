@@ -86,14 +86,17 @@ STEPS = [
 ]
 
 # Artefacts the agents consume — fingerprinted so post-run regeneration is
-# detectable (the 2026-08-18 failure mode).
-ARTEFACTS = [
-    "output/radar/latest.md",
-    "output/data/latest.md",
-    "output/data/fundamentals_latest.md",
-    "output/data/flow_latest.md",
-    "output/data/xray_latest.md",
-]
+# detectable (the 2026-08-18 failure mode). Dated paths since the `latest*.md`
+# pointers were retired on 2026-08-25; `artefacts()` takes the run date because
+# there is no longer a fixed filename that means "this run".
+def artefacts(date):
+    return [
+        f"output/radar/Heartbeat_Radar_{date}.md",
+        f"output/data/facts_{date}.md",
+        f"output/data/fundamentals_{date}.md",
+        f"output/data/flow_{date}.md",
+        f"output/data/xray_{date}.md",
+    ]
 
 
 def sha1(path):
@@ -137,24 +140,21 @@ def archive_paths(date):
     archive tells you exactly where it came from. Three groups:
 
       * the report itself — the deliverable
-      * the five artefacts the manifest fingerprints (`ARTEFACTS`) — these are
-        what the drift check is stated against
-      * the DATED artefacts for this date — what `tools/eval_reviewer.py`
-        actually compares the report to, and what a re-run silently replaces
-        because they carry the same date
+      * the DATED artefacts for this date — what the manifest fingerprints, what
+        `tools/eval_reviewer.py` compares the report to, and what a re-run
+        silently replaces because they carry the same date
 
     Missing entries are skipped, not an error: a `--skip`ped step leaves its
     artefact untouched and there is nothing to preserve.
     """
     rel = [f"evaluation_{date}.md"]
-    rel += [r[len("output/"):] for r in ARTEFACTS]
     for pat in (f"data/facts_{date}.*", f"data/fundamentals_{date}.*",
                 f"data/flow_{date}.*", f"data/xray_{date}.*",
                 f"data/analyst_{date}.*", f"radar/Heartbeat_Radar_{date}.md"):
         rel += [os.path.relpath(p, OUTPUT_DIR)
                 for p in sorted(glob.glob(os.path.join(OUTPUT_DIR, pat)))]
     seen, out = set(), []
-    for r in rel:                       # ARTEFACTS and the globs overlap
+    for r in rel:                       # the globs can overlap each other
         if r not in seen:
             seen.add(r)
             out.append(r)
@@ -336,7 +336,7 @@ def main():
 
     verdict, detail = radar_verdict()
     manifest["radar"] = {"verdict": verdict, "detail": detail}
-    for rel in ARTEFACTS:
+    for rel in artefacts(date):
         p = os.path.join(ROOT, rel)
         if os.path.exists(p):
             real = os.path.realpath(p)

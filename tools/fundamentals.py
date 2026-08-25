@@ -114,7 +114,7 @@ Inputs   input/*.csv                     via heartbeat_radar's schema detection
          input/capture/fundamentals_*.csv  for `file`/`browser` providers
 Output   output/data/fundamentals_<date>.csv   one row per roster name, carrying
                                                `provider` and `approx` per row
-         output/data/fundamentals_latest.md    the file the Trader reads
+         output/data/fundamentals_<date>.md    the file the Trader reads
 
 Usage    python3 tools/fundamentals.py
          python3 tools/fundamentals.py --include-discovery
@@ -659,14 +659,13 @@ def main():
             w.writerow(flat)
 
     md = render_md(rows, provider_name, today, demo, a.include_discovery)
-    for p in (os.path.join(a.out_dir, f"fundamentals_{today}.md"),
-              os.path.join(a.out_dir, "fundamentals_latest.md")):
-        with open(p, "w", encoding="utf-8") as f:
-            f.write(md)
+    md_path = os.path.join(a.out_dir, f"fundamentals_{today}.md")
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write(md)
 
     fail = sum(1 for r in rows if r["status"] == "FAIL")
     print(f"Wrote {csv_path}")
-    print(f"Wrote {os.path.join(a.out_dir, 'fundamentals_latest.md')}")
+    print(f"Wrote {md_path}")
     if fail:
         print(f"⛔ {fail} name(s) failed and are listed under FAILURES \u2014 "
               "check these live before writing their calls.", file=sys.stderr)

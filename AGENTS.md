@@ -136,7 +136,7 @@ positions go to the broker CSV in `input/`; theses go to `input/watchlist*.md` /
 ## Don'ts
 
 - **Do not invent scores or carry yesterday's forward** — every gate card reads
-  the same fields from `output/data/fundamentals_latest.md`. A gate applied to
+  the same fields from `output/data/fundamentals_<date>.md`. A gate applied to
   a name without a fresh score is a defect.
 - **Do not run a fund/ETF vehicle through the stock card** (gates 1-2 demand
   company fundamentals; failure mode is fake-pass or auto-fail). Use the `E`

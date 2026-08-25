@@ -42,7 +42,7 @@ Checks mechanised (manager numbering):
   12    🔴 only on held names
   13    every buy/add/starter carries a Trading + Investing stop pair,
         Trading at or above Investing (added 2026-08-23)
-  16    Sector X-ray table verbatim vs xray_latest.md
+  16    Sector X-ray table verbatim vs xray_<date>.md
   18    board sector headings exist in sector_map.md
   19    report sections match `templates/evaluation.template.md` exactly
        (added 2026-08-20 — `## Held positions (summary)` table mandatory)
@@ -289,8 +289,8 @@ def chasing_qualifier_defects(body):
     return out
 
 
-def dated_or_latest(rel_dir, stem, date, ext=".md"):
-    """Read `<stem>_<date><ext>`, falling back to `<stem>_latest<ext>`.
+def dated(rel_dir, stem, date, ext=".md"):
+    """Read `<stem>_<date><ext>`. Dated only — there is no fallback.
 
     EVERY DATA READ IN THIS SCRIPT MUST GO THROUGH HERE. `--date` used to select
     only the *report*; the four data files it is judged against were always read
@@ -304,13 +304,13 @@ def dated_or_latest(rel_dir, stem, date, ext=".md"):
     into a 3-round Trader↔Reviewer loop, a false defect is not a cosmetic
     problem; it burns two subagent runs a round and ends in a HALT.
 
-    The `_latest` fallback keeps a same-day run working before the dated file
-    lands, and keeps a clone with only `_latest` pointers reviewable.
+    The `_latest` fallback this used to carry was removed with the pointers on
+    2026-08-25. It existed to cover a same-day run before the dated file landed —
+    but every Phase A tool writes its dated file directly now, so the window it
+    covered is gone, and a fallback to a file that may carry a DIFFERENT date is
+    the exact defect this function was written to stop.
     """
     p = os.path.join(OUTPUT_DIR, rel_dir, f"{stem}_{date}{ext}")
-    if os.path.exists(p):
-        return read(p), os.path.basename(p)
-    p = os.path.join(OUTPUT_DIR, rel_dir, f"{stem}_latest{ext}")
     return read(p), os.path.basename(p)
 
 
@@ -357,7 +357,7 @@ def facts_flags(date):
     facts.py guarantees no token contains a space (see its NO SPACES comment).
     """
     import csv
-    for name in (f"facts_{date}.csv", "facts_latest.csv"):
+    for name in (f"facts_{date}.csv",):
         p = os.path.join(OUTPUT_DIR, "data", name)
         if not os.path.exists(p):
             continue
@@ -518,11 +518,8 @@ def main():
                            f"table: {', '.join(dupes[:12])}")
 
     # -- 3 facts FAILs handled ---------------------------------------------
-    # The facts sheet is `facts_<date>.md`, pointed at by the bare `latest.md`.
-    facts, facts_src = dated_or_latest("data", "facts", a.date)
-    if facts is None:
-        facts = read(os.path.join(OUTPUT_DIR, "data", "latest.md")) or ""
-        facts_src = "latest.md"
+    facts, facts_src = dated("data", "facts", a.date)
+    facts = facts or ""
     sources = [facts_src]
     fails = {m.group(1) for m in
              re.finditer(r"^\|\s*\*{0,2}([A-Z0-9.\-]+)\*{0,2}\s*\|[^\n]*⛔",
@@ -647,7 +644,7 @@ def main():
                        + " · ".join(sorted(bare)[:6]))
 
     # -- 8 card matches vehicle --------------------------------------------
-    fnd, fnd_src = dated_or_latest("data", "fundamentals", a.date)
+    fnd, fnd_src = dated("data", "fundamentals", a.date)
     fnd = fnd or ""
     sources.append(fnd_src)
     funds = {m.group(1) for m in
@@ -660,7 +657,7 @@ def main():
                        + ", ".join(wrong))
 
     # -- 10 round-trip reviews ---------------------------------------------
-    radar, radar_src = dated_or_latest("radar", "Heartbeat_Radar", a.date)
+    radar, radar_src = dated("radar", "Heartbeat_Radar", a.date)
     if radar is None:
         import glob as g
         rf = sorted(g.glob(os.path.join(OUTPUT_DIR, "radar", "Heartbeat_Radar_*.md")))
@@ -734,14 +731,11 @@ def main():
                        "dead: " + " · ".join(inverted))
 
     # -- 16 x-ray verbatim --------------------------------------------------
-    xray, xray_src = dated_or_latest("data", "xray", a.date)
+    xray, xray_src = dated("data", "xray", a.date)
     xray = xray or ""
-    # The sidecar carries its own `date`, so it self-validates. A `_latest.json`
-    # that turns out to describe another day is DISCARDED rather than compared —
-    # falling back to latest is exactly the cross-date bug `dated_or_latest`
-    # exists to prevent, and only the .md files are dated far enough back for
-    # historical reports.
-    xray_json, xray_json_src = dated_or_latest("data", "xray", a.date, ".json")
+    # The sidecar carries its own `date`, so it self-validates: one that turns out
+    # to describe another day is DISCARDED rather than compared.
+    xray_json, xray_json_src = dated("data", "xray", a.date, ".json")
     if xray_json:
         try:
             if json.loads(xray_json).get("date") != a.date:
@@ -887,9 +881,8 @@ def main():
     # -- output --------------------------------------------------------------
     print(f"eval_reviewer — evaluation_{a.date}.md — "
           f"{len(defects)} defect(s)")
-    # Name the data actually compared against. A `_latest` here on a historical
-    # date is the tell that the comparison is cross-date and its defects are
-    # not the report's fault — the failure mode this line exists to expose.
+    # Name the data actually compared against, so a missing dated file is visible
+    # as a missing comparison rather than silently weakening the review.
     print(f"  compared against: {' · '.join(sources)}")
     print(f"  eval_manifest: {emf_note}\n")
     for i, d in enumerate(defects, 1):

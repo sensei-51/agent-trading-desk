@@ -190,12 +190,12 @@ def snapshot_paths(date):
         # refetch and nothing else. Every other entry in this list is a record
         # of what a run SAW, which is the thing a re-run would destroy.
         f"evaluation_{date}.md",
-        "latest.md",
         os.path.join("ledger", "Gate_Ledger.csv"),
-        os.path.join("data", "latest.md"),
-        os.path.join("data", "fundamentals_latest.md"),
-        os.path.join("data", "xray_latest.md"),
-        os.path.join("radar", "latest.md"),
+        os.path.join("data", f"facts_{date}.md"),
+        os.path.join("data", f"fundamentals_{date}.md"),
+        os.path.join("data", f"flow_{date}.md"),
+        os.path.join("data", f"xray_{date}.md"),
+        os.path.join("radar", f"Heartbeat_Radar_{date}.md"),
     ]
 
 
@@ -294,29 +294,6 @@ def strip_ledger_rows(date, dry):
         "(snapshotted — the ledger is append-only in normal use)")
 
 
-def repoint_latest(date, dry):
-    """Refresh output/latest.md from the newest evaluation that is not today's.
-
-    latest.md is a plain copy, not a symlink — see the note in
-    `engine/heartbeat_radar.py` and docs/BACKLOG.md item 19.
-    """
-    link = os.path.join(REAL_OUTPUT, "latest.md")
-    cands = sorted(f for f in os.listdir(REAL_OUTPUT)
-                   if re.fullmatch(r"evaluation_\d{4}-\d{2}-\d{2}\.md", f)
-                   and f != f"evaluation_{date}.md")
-    target = cands[-1] if cands else None
-    if dry:
-        say(f"would refresh latest.md ← {target or '(removed — no prior evaluation)'}")
-        return
-    if os.path.lexists(link):
-        os.remove(link)
-    if target:
-        shutil.copyfile(os.path.join(REAL_OUTPUT, target), link)
-        say(f"latest.md ← {target}")
-    else:
-        say("latest.md removed (no prior evaluation to point at)")
-
-
 def remove(path, dry, why=""):
     if not os.path.lexists(path):
         return
@@ -341,7 +318,6 @@ def reset_in_place(date, dry):
     remove(state(f"eval_draft_{date}.md"), dry)
     remove(os.path.join(REAL_OUTPUT, f"evaluation_{date}.md"), dry,
            "(today's evaluation — snapshotted)")
-    repoint_latest(date, dry)
     strip_ledger_rows(date, dry)
     drop_json_entries(state("nav_history.json"), "date", date, "history", dry)
     drop_json_entries(state("rotation_history.json"), "date", date, "runs", dry)

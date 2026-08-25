@@ -12,8 +12,8 @@ The pipeline has two execution phases:
   Phase B — the Trader phase (the checklist of `agents/trader.md`)
     Until this script existed, was untimed. The Trader reads
     artefacts, runs the macro search, applies gate cards, writes
-    `output/evaluation_<date>.md`, runs validation, the Reviewer
-    checklist, and repoints `latest.md`. Whichever subagent does
+    `output/evaluation_<date>.md`, runs validation and the Reviewer
+    checklist. Whichever subagent does
     it cannot see how long it spent, so over-spend on macro
     search or under-spend on validation are equally invisible.
 
@@ -58,7 +58,7 @@ Usage in a script:
     t.mark("write")
     ...review...
     t.mark("review")
-    ...save + repoint latest.md...
+    ...save...
     t.mark("end")
     t.report()
 
@@ -89,7 +89,7 @@ PHASES = [
     "write",         # §7 — draft report and its required sections
     "validate",      # §8 — eval_reviewer.py + the stop-pair hand check
     "review",        # orchestrator step 5 — manager subagent pre-save check
-    "save",          # §9 — write evaluation_<date>.md + copy to latest.md
+    "save",          # §9 — write evaluation_<date>.md
     "end",           # last mark — closes the run
 ]
 
@@ -159,13 +159,13 @@ class TradeTimer:
             self.previous_runs.append(
                 {k: v for k, v in already.items() if k != "previous_runs"})
         self.artefact_globs = artefact_globs or [
-            "output/data/latest.md",
-            "output/data/fundamentals_latest.md",
-            "output/data/xray_latest.md",
-            "output/radar/latest.md",
+            "output/data/facts_<date>.md",
+            "output/data/fundamentals_<date>.md",
+            "output/data/flow_<date>.md",
+            "output/data/xray_<date>.md",
+            "output/radar/Heartbeat_Radar_<date>.md",
             "output/data/analyst_<date>.md",
             "output/evaluation_<date>.md",
-            "output/latest.md",
         ]
         self.entries = []  # [{name, started, finished, seconds}]
         self._t0 = time.time()

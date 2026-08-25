@@ -9,6 +9,8 @@ runs without them.
 input/
 ├── *.csv             Broker exports — drop CSVs here          ← REQUIRED
 │                      (gitignored)
+├── sample.example.csv  Bundled demo book — used only when no
+│                      real export is present            (committed)
 ├── watchlist.md    Tier 1 — candidate registry                 optional
 │                      (gitignored) — or watchlist_*.md for splits
 ├── tracking/        Tier 0 — radar-only coverage               optional
@@ -38,24 +40,39 @@ the column names are worked out at runtime:
 > **The day-move column is explicitly excluded.** Brokers ship `Day Gain/Loss %` right
 > next to `Gain/Loss %`, and `Price +/- today (%)` next to `Change (%)`. Silently picking
 > the wrong one turns every gain figure in the report into a one-day move — which reads
-> as plausible, which is what makes it dangerous. Both example exports here contain the
-> trap deliberately.
+> as plausible, which is what makes it dangerous. The bundled `sample.example.csv`
+> carries the trap deliberately — `Day Gain/Loss %` sits immediately left of
+> `Gain/Loss %`, and a correct run reports the latter.
 
 The sleeve label comes from the filename, so `holdings_isa.csv` reports as `ISA`.
 
 **Rows with no price series** — OEICs, gilts, T-bills, cash — are skipped by design.
 They are **counted and named in the run log**, never dropped quietly.
 
-### The two kinds of CSV
+### The three kinds of CSV
 
 | Filename | Means | Committed? | Radar behaviour |
 |---|---|---|---|
 | `anything.csv` | Your untouched broker export | **no** — gitignored | Real holdings |
 | `anything.public.csv` | Real positions scaled to a nominal NAV by `tools/anonymise.py` | yes | Real holdings |
+| `anything.example.csv` | Bundled demo book | yes | **Ignored** whenever any of the above is present |
 
-The published repo has real *positions* shipped via `*_a.public.csv` /
-`*_b.public.csv` (or your equivalent), so a reader sees the structure of a populated
-book. **Those are not recommendations**, see [`DISCLAIMER.md`](../DISCLAIMER.md).
+`sample.example.csv` ships with the repo so a fresh clone has a roster and
+`atd-daily` runs end to end before you have supplied anything. Eight real tickers
+across eight sectors, **invented quantities**, plus a cash line carrying the balance
+to the nominal £100,000 sleeve the rules files use in their worked examples. Each
+risk line sits near 4% of NAV, inside the 5% Tier-1 cap, so the demo book passes the
+repo's own concentration checks rather than warning on every row — a first run should
+show you the pipeline working, not a book already in breach.
+
+**The demo book is only ever a fallback.** The moment one real `*.csv` or
+`*.public.csv` appears in `input/`, every `*.example.csv` drops out of the roster —
+there is no mixing, and no need to delete the demo file. A run that is using it says
+`DEMO DATA` at the top of the reports and in the run log.
+
+If the published repo also ships real *positions* — via `*_a.public.csv` /
+`*_b.public.csv` or your equivalent — those are the structure of a populated book and
+**not recommendations**, see [`DISCLAIMER.md`](../DISCLAIMER.md).
 
 ### Publishing your positions
 
@@ -80,7 +97,10 @@ Resolved at runtime, in this order, with the basis for each printed on every run
 1. **Already suffixed** — `ISF.L` is taken as given.
 2. **Venue in the instrument name** — `iShares Physical Gold ETC (LSE:SGLN)` → `SGLN.L`.
    The most reliable signal there is, and most brokers emit it.
-3. **`sector_map.md`** — a hit in either the bare or `.L` form settles the question.
+3. **`sector_map.md`** — a hit settles the question, in the bare form or in whatever
+   suffixed form the map carries (`KNT.TO`, `SILG.L`). Listing *both* forms of one
+   symbol settles nothing and fails `checks --pre`: they are usually different
+   securities on different exchanges.
 4. **Priced in sterling** — `GBP`/`GBX` with no other evidence → `.L`.
 5. **Otherwise** a bare symbol, flagged `unconfirmed` in the log.
 
@@ -102,8 +122,8 @@ lists via `watchlist_<theme>.md` (the engine accepts any filename starting with
 > level in here, delete it — it is already stale.
 
 Rows must be shaped `| **TICKER** | ...`. Keep the bold ticker in the first cell or the
-name will not be screened. Bare symbols whose `.L` form appears in `sector_map.md` take
-the suffix automatically. Tag speculative names `SPECULATIVE` in any cell or section
+name will not be screened. Bare symbols whose suffixed form appears in `sector_map.md`
+take that suffix automatically. Tag speculative names `SPECULATIVE` in any cell or section
 heading and they are excluded from the RS percentile ranking.
 
 ## sector_map.md *(optional)*

@@ -179,13 +179,17 @@ watchlist, or anything under `providers/private/`, **HALT** — the allow-list
 should have made every one of those impossible, so a sighting means the boundary
 itself is broken.
 
-`input/tracking/universe.md`, `sector_map.md` and `sector-coverage.md` **do**
-ship and are not a halt. They were held back until 2026-08-24 and then
-deliberately allow-listed: they name public instruments, `sector_map.md` is
-required for a clone to run its own checks, and `universe.md` was generalised
-first — vendor scores scrubbed, sources reduced to "YouTube / news article",
-descriptions kept generic. A gate that fires on a decision already made teaches
-the operator to click past gates, which costs more than it saves.
+`input/tracking/universe.example.md` and `input/tracking/sector_map.md` **do**
+ship and are not a halt. Both name public instruments only; `sector_map.md` is
+required for a clone to run its own checks, and `universe.example.md` is a nine-name
+starter list written for this purpose, not a record of anybody's research.
+
+The real `input/tracking/universe.md` **stopped shipping on 2026-08-25**, as did
+`sector-coverage.md`. Seeing either in the file list is therefore a HALT now, where
+until that date it was expected. The universe had been generalised in Aug 2026 so it
+*could* ship — vendor scores scrubbed, sources reduced to "YouTube / news article" —
+but that only made it publishable, never worth publishing: it still records what its
+owner is researching and when each idea arrived.
 
 Commit with a message naming the run date:
 
