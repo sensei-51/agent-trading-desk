@@ -6,7 +6,7 @@ the Analyst's data ingestion.
 WHY THIS EXISTS
   The data-source contract (`docs/DATA_SOURCES.md`) names three sources every
   run must read live: a **fundamentals scorer** (composite /100 + 5 pillars + ACCEL/RECORD),
-  a chart / flow platform, and web search. Two of the three have a deterministic
+  a chart / darkpool platform, and web search. Two of the three have a deterministic
   half that belongs in a script — price/analyst/earnings/ratings in
   `tools/facts.py`, and the fundamentals leg here. The stock card's gates 1
   and 2 (composite ≥ 60 + ACCEL/RECORD; pillar floors CF ≥ 7, Stability ≥ 5,
@@ -591,7 +591,7 @@ def main():
     a = ap.parse_args()
 
     if a.list_providers:
-        for leg in ("fundamentals", "flow", "conviction"):
+        for leg in ("fundamentals", "darkpool", "conviction"):
             for name in providers.names(leg):
                 pr = providers.get(leg, name)
                 tag = " [private]" if pr.private else ""

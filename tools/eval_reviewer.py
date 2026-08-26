@@ -310,8 +310,26 @@ def dated(rel_dir, stem, date, ext=".md"):
     covered is gone, and a fallback to a file that may carry a DIFFERENT date is
     the exact defect this function was written to stop.
     """
-    p = os.path.join(OUTPUT_DIR, rel_dir, f"{stem}_{date}{ext}")
-    return read(p), os.path.basename(p)
+    return read(resolve_dated(rel_dir, f"{stem}_{date}{ext}", date)), \
+        f"{stem}_{date}{ext}"
+
+
+def resolve_dated(rel_dir, name, date):
+    """Flat path first, then the month archive `<rel_dir>/<YYYY-MM>/<name>`.
+
+    `tools/housekeeping.py --archive` MOVES dated artefacts older than its
+    window into a month folder, so `output/data/` stays short enough to skim.
+    It is a move and never a delete — the audit trail is intact, it is one
+    directory deeper. This function is the only thing in the pipeline that has
+    to know: everything else either writes today's file or globs for the newest.
+
+    Flat wins when both exist. An un-archived file is the live one; a stale copy
+    left behind in a month folder must never shadow it.
+    """
+    flat = os.path.join(OUTPUT_DIR, rel_dir, name)
+    if os.path.exists(flat):
+        return flat
+    return os.path.join(OUTPUT_DIR, rel_dir, date[:7], name)
 
 
 # ------------------------------------------------- deterministic facts flags
@@ -358,7 +376,7 @@ def facts_flags(date):
     """
     import csv
     for name in (f"facts_{date}.csv",):
-        p = os.path.join(OUTPUT_DIR, "data", name)
+        p = resolve_dated("data", name, date)
         if not os.path.exists(p):
             continue
         out = {}

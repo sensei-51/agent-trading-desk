@@ -13,7 +13,7 @@ No single tool runs this method. Each leg is non-overlapping, and skipping one l
 | Leg | Supplies | Feeds |
 |---|---|---|
 | **Fundamentals scorer** | Composite quality score, pillar sub-scores (profitability, growth, cash flow, stability, valuation), earnings-acceleration tags; sector screener for discovery | Signal 3 — earnings acceleration |
-| **Chart / flow platform** | Trend-MA direction and price-vs-MA, volume accumulation vs distribution, consolidation-box structure, RSI, earnings markers, institutional/dark-pool flow | Signals 1 and 2, plus the tactical flow read |
+| **Chart / darkpool platform** | Trend-MA direction and price-vs-MA, volume accumulation vs distribution, consolidation-box structure, RSI, earnings markers, institutional/darkpool | Signals 1 and 2, plus the tactical darkpool read |
 | **Web search** | Live price, 52-week high, analyst consensus PT, earnings date, rating changes | Pre-entry validation |
 
 **Rules:**
@@ -119,7 +119,7 @@ Every watchlist row needs: **Breakout Point** (the prior high / resistance), **T
 2. **Role split.** 50-day = tactical (adds, pullback support, Trading Stop reference). 150-day = strategic (thesis invalidation). Both stops still set at entry; the 150-day takes over as the trend matures.
 3. **Index tripwire.** The broad index closing below a flattening or declining 150-day = automatic 🔴 DEFENSIVE regime review in the daily run. Historical precedent: the S&P broke its rising 150-day in late 2007, roughly 8 months before the crisis peak.
 4. **Volume trigger = 2× average** (see Signal 1).
-5. **Rotation, reactive:** when a held leader stalls (base fails, sector goes tired), check where the flow went *before* redeploying. Quality gates are unchanged at the destination.
+5. **Rotation, reactive:** when a held leader stalls (base fails, sector goes tired), check where the darkpool went *before* redeploying. Quality gates are unchanged at the destination.
 6. **Rotation, proactive.** Rule 5 only fires *after* a holding stalls, which finds the destination late. The radar's `## Rotation read` detects rotation independently by clustering flags across the whole universe by sector: **2+ names arriving with little leaving = ROTATION-IN; 3+ leaving with little arriving = ROTATION-OUT.** Check it every run, before assessing any individual name.
    - **A cluster of breakouts in an "off-theme" sector is the highest-value output of the radar**, because the active-theme list always describes the *previous* regime. Never filter candidates by theme before reading the clusters.
    - **Three states, not two** *(22 Aug 2026)*. Arriving and leaving are both *transitions*; a sector that is simply **already moving** is neither, and for eighteen consecutive runs such a sector produced no row in the table at all — the strongest 20-day momentum on the board reading as silence. `SUSTAINED` is that third state: 2+ members, and at least half the sector, above a rising line and near their highs while accumulating above the universe median. It is a **weaker claim than ROTATION-IN and must not be read as one** — money has not left and is still being committed, which is not the same as money arriving.

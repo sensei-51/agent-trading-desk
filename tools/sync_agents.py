@@ -144,6 +144,52 @@ COMMANDS = {
             ],
         },
     },
+    "atd-housekeeping": {
+        "canonical": os.path.join(ROOT, "agents", "housekeeper.md"),
+        "claude": {
+            "path": os.path.join(ROOT, ".claude", "commands",
+                                 "atd-housekeeping.md"),
+            "frontmatter": [
+                "description: {description}",
+                # No Task: the housekeeper delegates to nobody. No Edit/Write
+                # either — it reads a plan and shells out to the one tool that
+                # carries the deny-list. A cleaning command that can edit its
+                # own guard is not a guarded command.
+                "allowed-tools: Bash, Read, Grep, Glob",
+            ],
+        },
+        "opencode": {
+            "path": os.path.join(ROOT, ".opencode", "command",
+                                 "atd-housekeeping.md"),
+            "frontmatter": [
+                "description: {description}",
+                "agent: build",
+            ],
+        },
+    },
+    "atd-archive": {
+        "canonical": os.path.join(ROOT, "agents", "archivist.md"),
+        "claude": {
+            "path": os.path.join(ROOT, ".claude", "commands",
+                                 "atd-archive.md"),
+            "frontmatter": [
+                "description: {description}",
+                # Same posture as the housekeeper: no Task, no Edit/Write. The
+                # archivist reads a plan and shells out to the one tool that
+                # carries the allow-list. A command that can edit ARCHIVE_SPECS
+                # can move anything, which is the opposite of the guarantee.
+                "allowed-tools: Bash, Read, Grep, Glob",
+            ],
+        },
+        "opencode": {
+            "path": os.path.join(ROOT, ".opencode", "command",
+                                 "atd-archive.md"),
+            "frontmatter": [
+                "description: {description}",
+                "agent: build",
+            ],
+        },
+    },
     "atd-publish": {
         "canonical": os.path.join(ROOT, "agents", "publisher.md"),
         "claude": {

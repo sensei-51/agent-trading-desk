@@ -1,23 +1,29 @@
 ---
-description: Agent Trading Desk publish run — builds the public tree from this private one, runs both leak gates, and stages a commit in the public repo. Stops before the push; the human pushes. Halts on the first gate failure.
+description: Agent Trading Desk publish run — builds the public tree from this private one, runs both leak gates, and stages a commit in the public repo. Shows the human exactly what would reach GitHub, waits for their explicit yes, and only then pushes. Halts on the first gate failure.
 ---
 
 
-You are the **publisher**. You turn this private tree into the public one and
-leave a reviewed commit sitting on the human's disk. You do **not** push.
+You are the **publisher**. You turn this private tree into the public one, show
+the human exactly what would reach GitHub, and push only once they have said yes.
 
 Publishing is a one-way door: git history is permanent. What ships is the
 method, plus a track record in counts and percentages — never a position size,
 a cash figure or the working papers behind them. A leak that reaches GitHub
-cannot be fixed by a later commit. So this contract is deliberately
-gate-heavy, and it ends one step short of irreversible. Since the ledger step
-became automatic, this is the **only** command in the repo that deliberately
-stops being autonomous — because it is the only one whose last step cannot be
-undone.
+cannot be fixed by a later commit. So this contract is deliberately gate-heavy,
+and its last step is guarded by a human decision rather than by a rule you keep
+for them.
 
-**Run every step in order. Do not ask the human to confirm between steps.** Stop
-only where a HALT is specified, and when you stop, say which step stopped you
-and what the human has to do.
+**Until 2026-08-25 this command never pushed at all** — it stopped at a staged
+commit and the human ran `git push` themselves. That was changed by the owner,
+deliberately, after the rule was waived in practice: a gate that gets talked
+past without being rewritten is worse than no gate, because it teaches everyone
+that the written contract is not the real one. The protection it provided is
+kept in step 8, which is now the only interactive step in the repo.
+
+**Run steps 1–7 in order without asking the human anything.** Stop only where a
+HALT is specified, and when you stop, say which step stopped you and what the
+human has to do. **Step 8 is the one deliberate exception** — it asks, and it
+waits.
 
 Let `<dst>` be the destination tree. Default `~/trading-portfolio-public`; if
 `$ARGUMENTS` names a path, use that instead.
@@ -195,12 +201,41 @@ Commit with a message naming the run date:
 git -C <dst> commit -m "Publish <date>"
 ```
 
-## 8 — Stop here
+## 8 — Show the human, wait for a yes, then push
 
-> **Never push. Not when every gate is green, not when the diff looks obviously
-> right, not if asked to "just finish it" mid-run.** A push is permanent and
-> public. The human reads the staged file list and pushes themselves. This is
-> the one place this command deliberately stops being autonomous.
+A push is permanent and public. This step exists so that it happens because the
+human looked and agreed, never because the run had momentum.
+
+**Show them, in this order, and do not summarise any of it:**
+
+1. The **full** `git status --short` from step 7 — every path, untruncated. If it
+   is long, show it long.
+2. `git -C <dst> log --oneline origin/main..HEAD` — the commits that would land.
+3. `git -C <dst> diff --stat origin/main..HEAD` — the shape of the change.
+4. One plain sentence naming anything a reader would newly learn about the book:
+   a ticker named for the first time, a rule that changed, a file that
+   disappears from the public repo.
+
+**Then ask, and wait.** Ask whether to push. Do not push on silence, on a
+neighbouring instruction, or on your own reading of the diff. Only an explicit
+yes from the human in this conversation authorises it.
+
+- **Yes** → push:
+  ```bash
+  git -C <dst> push -u origin main
+  ```
+  Then re-read the remote and confirm what actually landed — `git fetch` and
+  check `origin/main` moved to the expected sha, and that the private files
+  (`input/tracking/universe.md`, `sector-coverage.md`, `watchlist.md`, the broker
+  CSVs) are absent from `origin/main`. Report that verification, not the push
+  command's own output: the push succeeding says nothing about *what* it sent.
+- **No, or anything ambiguous** → do not push. Leave the commit staged, say so
+  plainly, and give them the command to run themselves. A staged commit is a
+  perfectly good outcome; it is where this command used to end every time.
+
+**Never create the GitHub repo, and never push to a remote you resolved by
+guessing.** The remote comes from the rules at the top of this file or the human
+tells you — pushing a portfolio to the wrong account is not recoverable.
 
 ## 9 — Report back
 
@@ -214,8 +249,8 @@ Held back   <private providers, verbatim from publish.py>
 Track rec.  <n> decisions · <n> closed trades scored · <online|offline>
 Build       <n> file(s) copied, <n> excluded (allow-list)
 Gates       post-conditions <PASS|FAIL> · vendor sweep <PASS|FAIL> · leak sweep <PASS|FAIL>
-Commit      <sha> "<message>" — <n> file(s) changed, NOT pushed
-Next        git -C <dst> push -u origin main
+Commit      <sha> "<message>" — <n> file(s) changed
+Push        <PUSHED origin/main <old>..<new>, verified | DECLINED — staged only | n/a — halted>
 ```
 
 Then anything a reader of the public repo would notice changed since last time —
@@ -225,8 +260,10 @@ new evaluations, changed rules — one line each.
 
 ## Hard limits
 
-- **Never push, and never create the GitHub repo.** Step 6 stages; the human
-  pushes to a repo they made themselves.
+- **Never push without an explicit yes** to step 8's question, given by the
+  human in this conversation, after they have seen the full file list. Not on
+  silence, not on "looks good", not because every gate went green. **Never create
+  the GitHub repo** — the human makes it themselves.
 - **Never edit the private tree.** This command reads from it and writes only to
   `<dst>`. If something here is wrong, say so and HALT.
 - **Never run `checks.py --publish` in the private tree** and report the result

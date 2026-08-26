@@ -11,7 +11,7 @@
     "free Yahoo data and marks every row approximate. Calibrated 18 Aug 2026,",
     "r=0.88 vs a curated scorer. See docs/DERIVED_CALIBRATION_2026-08-18.md.",
     "",
-    "flow / conviction — there is no free substitute for either, and that is fine.",
+    "darkpool / conviction — there is no free substitute for either, and that is fine.",
     "DATA_SOURCES.md is explicit: drop a leg you cannot source rather than proxy",
     "it. 'none' renders them ABSENT and the rules already handle that.",
     "",
@@ -20,6 +20,6 @@
     "null to disable it."
   ],
   "fundamentals": { "provider": "none", "fallback": null },
-  "flow":         { "provider": "none", "fallback": null },
+  "darkpool":         { "provider": "none", "fallback": null },
   "conviction":   { "provider": "none", "fallback": null }
 }

@@ -73,7 +73,7 @@ of one is the input to the next. None self-assesses.
 > The Analyst and Reviewer are subagents because each has a context **different
 > from the Trader's** — that independence is the product. The Trader is a
 > subagent because its judgement is one continuous read-the-roster-and-write-
-> calls flow, and running it as an agent buys loop recovery on partial failure,
+> calls darkpool, and running it as an agent buys loop recovery on partial failure,
 > in-place access to the previous run's state, and rulebook-drift observability.
 
 ---

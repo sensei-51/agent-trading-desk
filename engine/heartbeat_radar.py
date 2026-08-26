@@ -3592,7 +3592,7 @@ def main():
         L += ["", "**Bellwether fetch failures (sector gauge blind):** " + ", ".join(bell_errs)]
 
     L += ["", "*Screen output only — every candidate still needs the full stack: fundamentals-screen "
-          "score/Record Quarter, chart confirmation, institutional flow, and pre-entry validation "
+          "score/Record Quarter, chart confirmation, darkpool, and pre-entry validation "
           "(earnings 7d / 52-wk high / consensus / TRAP CHECK).*"]
 
     outfile = a.out or os.path.join(OUTPUT_DIR, "radar", f"Heartbeat_Radar_{today}.md")

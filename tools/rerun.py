@@ -193,7 +193,7 @@ def snapshot_paths(date):
         os.path.join("ledger", "Gate_Ledger.csv"),
         os.path.join("data", f"facts_{date}.md"),
         os.path.join("data", f"fundamentals_{date}.md"),
-        os.path.join("data", f"flow_{date}.md"),
+        os.path.join("data", f"darkpool_{date}.md"),
         os.path.join("data", f"xray_{date}.md"),
         os.path.join("radar", f"Heartbeat_Radar_{date}.md"),
     ]

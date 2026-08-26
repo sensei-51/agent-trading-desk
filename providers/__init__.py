@@ -4,7 +4,7 @@ providers — auto-discovered plugins, one per (leg, source).
 
     providers/
       fundamentals/{none,derived,example}.py     public, ship in the repo
-      flow/{none,example}.py
+      darkpool/{none,example}.py
       conviction/{none,example}.py
       private/<leg>/*.py                         GITIGNORED — never published
 
@@ -84,7 +84,7 @@ class Provider:
         return contracts.validate_payload(self.leg, out, self.path)
 
     def load(self, ctx=None):
-        """Whole-book legs (flow, conviction)."""
+        """Whole-book legs (darkpool, conviction)."""
         if self.leg not in contracts.WHOLE_BOOK_LEGS:
             raise ProviderError(f"{self.name}: load() on a per-ticker leg ({self.leg})")
         out = self.module.load(ctx or {})

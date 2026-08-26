@@ -70,7 +70,7 @@ NOT contribute its rows to the membership pool.
 
 - One row per ticker per pool file. Don't list the same name in
   `universe.md` and `sector-coverage.md`.
-- Tickers in `universe.md` flow in via paste-and-forget; delete the row
+- Tickers in `universe.md` darkpool in via paste-and-forget; delete the row
   on promotion (to a watchlist) or after several sweeps of no follow-through.
 - Tickers in `sector-coverage.md` are kept intentionally; remove only when
   the sector has gained enough own-roster members to read without them.

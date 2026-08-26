@@ -108,7 +108,7 @@ the tag first, then the call:
 
 Required treatments:
 - Render the **trend word attached to the tag** — "ROTATION-OUT · STRENGTHENING", never
-  a bare "STRENGTHENING." State reads as the flow, not as the sector rising.
+  a bare "STRENGTHENING." State reads as the darkpool, not as the sector rising.
 - For every `ROTATION-IN / STRONG-IN / CHASING / SUSTAINED` sector, find the **buyable
   ticker**: the bellwether table's *Investable line* in `input/tracking/sector_map.md`.
   Run it through the appropriate gate card. CHASING adds the "wait for pullback"
@@ -136,7 +136,7 @@ read when it exists; only re-search when the Analyst marked a leg unresolved.
 
 ### 3. Signal interpretation
 
-Distinguish **institutional flow** (tactical 30-90 day, insufficient grounds for an exit
+Distinguish **darkpool** (tactical 30-90 day, insufficient grounds for an exit
 on its own) from **model-portfolio weights** (strategic conviction, supports the
 sell/trim decision this section governs).
 
@@ -145,7 +145,7 @@ On any sell or trim: state explicitly **(a) long-term thesis challenged** vs
 (journal 30 Jun, read live 26 Jul)."*). A stale conviction number is worse than an
 absent one — it reads as current.
 
-> Flow signals alone are never sufficient to exit a position with a valid long-term
+> Darkpool signals alone are never sufficient to exit a position with a valid long-term
 > thesis. Note the signal, default to hold. A full exit requires (thesis challenged
 > AND strategic exit signal) OR (position at-or-below cost).
 

@@ -161,7 +161,7 @@ class TradeTimer:
         self.artefact_globs = artefact_globs or [
             "output/data/facts_<date>.md",
             "output/data/fundamentals_<date>.md",
-            "output/data/flow_<date>.md",
+            "output/data/darkpool_<date>.md",
             "output/data/xray_<date>.md",
             "output/radar/Heartbeat_Radar_<date>.md",
             "output/data/analyst_<date>.md",

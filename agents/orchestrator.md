@@ -23,14 +23,14 @@ remember or infer from a filename.
 python3 tools/run_daily.py
 ```
 
-Runs `checks-pre → radar → facts → fundamentals → flow → xray → checks-post`,
+Runs `checks-pre → radar → facts → fundamentals → darkpool → xray → checks-post`,
 halting on the first non-zero exit, and stamps `output/.state/run_manifest.json`.
 
 - **Exit 0** → continue.
 - **Non-zero** → read the manifest's `steps[]`, name the failing step and its
   exit code, and **HALT**. Do not run a subagent against half-built artefacts;
   that is precisely the 2026-08-18 failure this script exists to prevent.
-- `checks-pre` reporting a stale or missing `input/capture/flow_<date>.md` or
+- `checks-pre` reporting a stale or missing `input/capture/darkpool_<date>.md` or
   `conviction_<date>.md` is **not** a failure. Those legs render `ABSENT`, which
   is honest, and no gate consults them yet. Carry the fact into your final
   summary so the human knows the leg was absent, and continue.

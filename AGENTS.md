@@ -18,8 +18,8 @@ That set is enough to act. Go to `rules/*.md` (governance, method, gates) only
 when a call needs a judgement you can't make from the docs.
 
 **Before changing anything in the rotation path**, read
-`docs/FLOW_FIRST_PROPOSAL.md` — but read its banner first. **Its core change was
-declined on 22 Aug (D5):** the radar keeps the rotation read and the flow leg is a
+`docs/DARKPOOL_FIRST_PROPOSAL.md` — but read its banner first. **Its core change was
+declined on 22 Aug (D5):** the radar keeps the rotation read and the darkpool leg is a
 **permanent optional overlay** — never a gate, never a required input. Phases 3, 4
 and 5 are retired, so the "Phase 3 evidence gate" no longer exists as a condition
 for anything. Rotation v2 plus `SUSTAINED` governs today's runs. The decision and
@@ -54,11 +54,12 @@ a second time.
 The individual steps, for a partial or manual run:
 
 ```bash
-python3 tools/run_daily.py          # Phase A: radar · facts · fundamentals · flow · xray · checks
+python3 tools/run_daily.py          # Phase A: radar · facts · fundamentals · darkpool · xray · checks
 python3 tools/eval_reviewer.py      # mechanical pre-save review (0 defects is the gate)
 python3 tools/rerun.py             # re-run today in an isolated sandbox (default); --list · --in-place
 python3 tools/append_gate_ledger.py # record today's non-trivial decisions in the ledger
 python3 tools/sync_agents.py --check  # CI check on canonical drift, agents + commands (invariant 8)
+python3 tools/housekeeping.py       # dry-run cleanup report; --apply to act (never touches input/ or the ledger)
 ```
 
 Phase B (the Trader's call) is owned by the `trader` subagent in
@@ -127,7 +128,8 @@ positions go to the broker CSV in `input/`; theses go to `input/watchlist*.md` /
 - **Subagent + command sync**: `python3 tools/sync_agents.py` regenerates
   `.claude/agents/*.md` and `.opencode/agent/*.md` from canonicals in `agents/`,
   and the command wrappers from their canonicals: `/atd-daily` from
-  `agents/orchestrator.md`, `/atd-publish` from `agents/publisher.md` (each to
+  `agents/orchestrator.md`, `/atd-publish` from `agents/publisher.md`,
+  `/atd-housekeeping` from `agents/housekeeper.md` (each to
   `.claude/commands/<name>.md` and `.opencode/command/<name>.md`).
   `python3 tools/sync_agents.py --check` is **invariant 8** of `docs/TECHNICAL_ARCHITECTURE.md`:
   drift must be caught by CI. **Edit a canonical, never a wrapper** — that's how

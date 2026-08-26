@@ -5,7 +5,7 @@ contracts.py — what a provider must declare, and what it must return.
 A "leg" is one of the three evidence sources the method runs on:
 
     fundamentals   is this a good business?          per-ticker
-    flow           what is being traded right now?   whole-portfolio
+    darkpool           what is being traded right now?   whole-portfolio
     conviction     what does the strategic source say? whole-portfolio
 
 A "provider" is one implementation of one leg — Curated, a Yahoo-derived proxy,
@@ -26,12 +26,12 @@ clauses it cannot rather than poisoning the verdict.
 
 # ---------------------------------------------------------------- legs
 
-LEGS = ("fundamentals", "flow", "conviction")
+LEGS = ("fundamentals", "darkpool", "conviction")
 
 # Legs that answer per-ticker (provider exposes `fetch(ticker, ctx)`) vs legs
 # that answer for the whole book at once (provider exposes `load(ctx)`).
 PER_TICKER_LEGS = ("fundamentals",)
-WHOLE_BOOK_LEGS = ("flow", "conviction")
+WHOLE_BOOK_LEGS = ("darkpool", "conviction")
 
 # ---------------------------------------------------------------- status
 
@@ -61,8 +61,8 @@ CAPABILITIES = {
         "insiders",   # Form 4 insider buy/sell
         "congress",   # legislator disclosures
     },
-    "flow": {
-        "premium",    # currency-weighted flow per ticker
+    "darkpool": {
+        "premium",    # currency-weighted darkpool per ticker
         "direction",  # bullish/bearish split
         "prints",     # individual trade detail
         "unusual",    # unusualness / conviction score per print

@@ -281,7 +281,7 @@ def check_providers_discover():
     if errs:
         return FAIL, "malformed provider(s): " + "; ".join(errs)
     counts = []
-    for leg in ("fundamentals", "flow", "conviction"):
+    for leg in ("fundamentals", "darkpool", "conviction"):
         counts.append(f"{leg} {len(providers.names(leg))}")
     priv = providers.private_providers()
     tail = f"; {len(priv)} private" if priv else ""
@@ -299,7 +299,7 @@ def check_capture_freshness():
     """
     cap_dir = os.path.join(INPUT_DIR, "capture")
     stale, fresh, missing = [], [], []
-    for leg in ("fundamentals", "flow", "conviction"):
+    for leg in ("fundamentals", "darkpool", "conviction"):
         name = _configured_provider(leg)
         if not name or name == "none":
             continue
@@ -374,9 +374,9 @@ def check_provider_config():
     new = os.path.join(INPUT_DIR, "config", "providers.json")
     if not os.path.exists(new):
         return WARN, ("no providers.json — every leg defaults to 'none' "
-                      "(gates INFERRED, flow and conviction ABSENT)")
+                      "(gates INFERRED, darkpool and conviction ABSENT)")
     bits, problems = [], []
-    for leg in ("fundamentals", "flow", "conviction"):
+    for leg in ("fundamentals", "darkpool", "conviction"):
         name = _configured_provider(leg) or "none"
         p = providers.get(leg, name)
         if p is None:
@@ -391,7 +391,7 @@ def check_provider_config():
             cfg = json.load(open(new, encoding="utf-8"))
         except ValueError as e:
             return FAIL, f"providers.json does not parse: {e}"
-        for leg in ("fundamentals", "flow", "conviction"):
+        for leg in ("fundamentals", "darkpool", "conviction"):
             fb = (cfg.get(leg) or {}).get("fallback")
             if fb == "none":
                 problems.append(f"{leg}: fallback 'none' is not allowed — use null")

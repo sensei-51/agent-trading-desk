@@ -19,7 +19,7 @@ WHAT IT RUNS, IN ORDER (each halts the pipeline on failure):
   1. radar             engine/heartbeat_radar.py
   2. facts             tools/facts.py
   3. fundamentals      tools/fundamentals.py
-  3b. flow             tools/flow.py            (flow + conviction legs)
+  3b. darkpool             tools/darkpool.py            (darkpool + conviction legs)
   4. xray              tools/xray.py   (fails on unclassified HELD names)
   5. checks  --post    bloc ceiling, NAV consistency, radar age, honesty
                        ("ledger touched" fails until append_gate_ledger has
@@ -77,10 +77,10 @@ STEPS = [
     ("radar", [PY, "engine/heartbeat_radar.py"]),
     ("facts", [PY, "tools/facts.py"]),
     ("fundamentals", [PY, "tools/fundamentals.py"]),
-    # Whole-book legs. Behaviour-neutral by design: renders flow and conviction
+    # Whole-book legs. Behaviour-neutral by design: renders darkpool and conviction
     # for the agents to read; no gate consults it yet — ETF gate 1 is still the
-    # radar's rotation read. See docs/FLOW_FIRST_PROPOSAL.md Phase 1 vs Phase 4.
-    ("flow", [PY, "tools/flow.py"]),
+    # radar's rotation read. See docs/DARKPOOL_FIRST_PROPOSAL.md Phase 1 vs Phase 4.
+    ("darkpool", [PY, "tools/darkpool.py"]),
     ("xray", [PY, "tools/xray.py"]),
     ("checks-post", [PY, "tools/checks.py", "--post"]),
 ]
@@ -94,7 +94,7 @@ def artefacts(date):
         f"output/radar/Heartbeat_Radar_{date}.md",
         f"output/data/facts_{date}.md",
         f"output/data/fundamentals_{date}.md",
-        f"output/data/flow_{date}.md",
+        f"output/data/darkpool_{date}.md",
         f"output/data/xray_{date}.md",
     ]
 
@@ -149,7 +149,7 @@ def archive_paths(date):
     """
     rel = [f"evaluation_{date}.md"]
     for pat in (f"data/facts_{date}.*", f"data/fundamentals_{date}.*",
-                f"data/flow_{date}.*", f"data/xray_{date}.*",
+                f"data/darkpool_{date}.*", f"data/xray_{date}.*",
                 f"data/analyst_{date}.*", f"radar/Heartbeat_Radar_{date}.md"):
         rel += [os.path.relpath(p, OUTPUT_DIR)
                 for p in sorted(glob.glob(os.path.join(OUTPUT_DIR, pat)))]
@@ -169,7 +169,7 @@ def archive_prior_run(date, run):
     mechanism: seven names flipped between AVOID and WAIT across two runs of the
     same closed-market day, and **the question "did the inputs move, or did the
     Trader just decide differently?" could not be answered** — Phase A had
-    already overwritten facts, fundamentals, flow, xray and the radar in place.
+    already overwritten facts, fundamentals, darkpool, xray and the radar in place.
     A report you cannot diff against its own inputs is a report you cannot
     audit. So the whole input set goes with it.
 

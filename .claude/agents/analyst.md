@@ -28,7 +28,7 @@ defect you can ship: the gate card's decision on the wrong number silently recol
 
 | What | Where |
 |---|---|
-| Source config | `input/config/providers.json` — one `{provider, fallback}` per leg (`fundamentals`, `flow`, `conviction`) |
+| Source config | `input/config/providers.json` — one `{provider, fallback}` per leg (`fundamentals`, `darkpool`, `conviction`) |
 | Roster (`hr` loader) | `engine/heartbeat_radar.py` — `hr.load_roster`, `hr.load_watchlists`, `hr.load_sector_map`, `hr.INPUT_DIR`, `hr.OUTPUT_DIR` |
 | Facts script | `tools/facts.py` — writes `output/data/facts_<date>.csv` + `output/data/facts_<date>.md` |
 | Fundamentals script | `tools/fundamentals.py` — writes `output/data/fundamentals_<date>.csv` + `output/data/fundamentals_<date>.md` |
