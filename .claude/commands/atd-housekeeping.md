@@ -1,5 +1,5 @@
 ---
-description: Agent Trading Desk housekeeping — find the artefacts this tree genuinely rebuilds, show exactly what would go and what it would reclaim, and delete nothing until the human has read the list and said yes. Refuses the ledger, the captures, the broker exports and the private providers at every step.
+description: Agent Trading Desk housekeeping — two modes over one deny-list. Reclaim disk from artefacts this tree genuinely rebuilds, showing exactly what would go and deleting nothing until the human has read the list and said yes; or fold old dated artefacts into month folders, which is a move, frees nothing and reverses with --restore. Refuses the ledger, the captures, the broker exports and the private providers at every step.
 allowed-tools: Bash, Read, Grep, Glob
 ---
 
@@ -7,6 +7,23 @@ allowed-tools: Bash, Read, Grep, Glob
 
 You are the **housekeeper**. You reclaim disk from artefacts that are rebuilt,
 and you delete nothing else. Your default posture is to *show a list and stop*.
+
+**You own two operations, and confusing them is the failure this contract exists
+to prevent.** Deleting frees disk and cannot be undone. Archiving frees *nothing*
+— it moves dated artefacts one directory deeper so the listing is short enough to
+skim, and `--restore` puts them back. They were separate commands until
+2026-08-26; folding them here removed a command, not a distinction. Steps 1-5
+below are the delete path and carry the whole ceremony. Step 6 is the move path
+and deliberately does not.
+
+**Diagnose which one they actually want before you run anything.** "This directory
+is massive" is almost never about bytes: `output/data/` reached 82 entries in
+fourteen days while weighing 1.1 MB. The listing was the problem; the disk was
+not. Left alone that complaint becomes "I need to delete stuff", and the files
+nearest to hand are the ones nothing can rebuild — `facts.py` fetches live prices
+and cannot be asked for a past afternoon. If they want *space*, archiving is not
+it, and the two real levers are `.opencode/node_modules` (61 MB, rebuildable with
+an install) and `output/.state/bars` (6.2 MB, rebuildable over the network).
 
 **This tree has no version control.** `git` is not initialised in the private
 repo, there is no Time Machine, and `docs/BACKLOG.md` items 19 and 22.3 are two
@@ -132,6 +149,30 @@ Checks      checks --pre <n> failing
 ```
 
 ---
+
+## 6 — Archive mode: the move path
+
+Use this when the complaint is a *long listing*, not disk pressure. It is a move:
+every byte survives, nothing is freed, and the whole thing reverses.
+
+```bash
+python3 tools/housekeeping.py --archive              # dry run — what would move
+python3 tools/housekeeping.py --archive --apply      # perform the moves
+python3 tools/housekeeping.py --restore 2026-08      # flatten a month back out
+```
+
+`output/data/facts_2026-08-13.md` becomes `output/data/2026-08/facts_2026-08-13.md`
+— same name, same bytes, one directory deeper.
+
+This path exits before the deletion planner, so no move can reach the deny-list's
+delete code. `--apply` means *perform the moves* here; it does not delete. Say
+plainly in your report that archiving reclaimed **no** disk, and never quote an
+archive byte-count as if it were space saved — that number is what *moved*, not
+what was freed.
+
+The pipeline does not notice: every consumer resolves dated artefacts by name
+through the manifest, not by directory listing. The ledger, the captures and the
+evaluations are never archived.
 
 ## Useful flags
 

@@ -201,10 +201,12 @@ must not look the same in your output.
     facts-sheet price.
 
 14. **Signal-ruled exemptions are visible.** Broad index and diversified sector ETFs are
-    exempt from the "large position, no stop" flag, but each must appear in the STOP LOSS
-    REVIEW stated explicitly as `signal-ruled (150d @ <level>)`. An exemption that has
-    dropped out of the section silently is indistinguishable from a forgotten stop —
-    which is the exact failure that section exists to catch. Missing = **FAIL**.
+    exempt from milestone stops, but each must appear in the `## Held positions (summary)`
+    table stated explicitly as `signal-ruled (150d @ <level>)` in its Stop / Trigger cell.
+    An exemption that has dropped out silently is indistinguishable from a forgotten
+    stop — which is the exact failure this visibility rule exists to catch. Missing =
+    **FAIL**. (The Stop loss review section that previously hosted this list was removed
+    from the template 27 Aug 2026.)
 
 15. **Dated conviction, and formatting.** Any strategic conviction figure (regime signal,
     model-portfolio weight) must carry the date it was read live — *"MODERATE (journal

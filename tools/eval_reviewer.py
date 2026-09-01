@@ -685,13 +685,13 @@ def main():
            re.finditer(r"^\|\s*\*{0,2}([A-Z0-9.\-]+)\*{0,2}\s*\|[^\n]*ROUND-TRIP-RISK",
                        radar, re.M)}
     rtr_held = rtr & held
-    review = re.search(r"^## Stop loss review.*?$(.*?)(?=^## |\Z)", body,
+    review = re.search(r"^## Round-trip reviews.*?$(.*?)(?=^## |\Z)", body,
                        re.M | re.S)
     review_body = review.group(1) if review else ""
     missing_rev = sorted(t for t in rtr_held if t not in review_body)
     if missing_rev:
         defects.append("[10] ROUND-TRIP-RISK holdings without a row in the "
-                       "stop-loss review: " + ", ".join(missing_rev))
+                       "round-trip reviews: " + ", ".join(missing_rev))
 
     # -- 11 CHASING qualifier, per gate card ---------------------------------
     defects.extend(chasing_qualifier_defects(body))

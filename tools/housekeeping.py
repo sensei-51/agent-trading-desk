@@ -631,14 +631,19 @@ CLEANABLE = {
 #
 # Clutter complaints usually want a MOVE, not a delete: `output/data/` reached
 # 82 entries in fourteen days while weighing 1.1 MB. This tool surfaces the
-# opportunity and deliberately cannot act on it — deleting works off a
-# deny-list and is irreversible, archiving works off an allow-list and reverses
-# with `mv`, and one flag that could do either invites the wrong reflex.
+# opportunity — deleting works off a deny-list and is irreversible, archiving
+# works off an allow-list and reverses with `mv`, and one flag that could do
+# either invites the wrong reflex.
 #
-# `/atd-archive` and `tools/archive.py` own the operation. One implementation.
+# Since 2026-08-26 this file exposes both, as separate modes rather than
+# separate commands: `--archive` / `--restore` dispatch before the deletion
+# planner is ever built, so a move cannot reach the delete path. The operation
+# itself still lives in `tools/archive.py` and is imported, never re-implemented
+# — folding the command did not fork the code.
 # --------------------------------------------------------------------------
 
-from archive import scan_archive          # noqa: E402  (same directory)
+from archive import (scan_archive, scan_restore, report as archive_report,
+                     MONTH_RE)          # noqa: E402  (same directory)
 
 ARCHIVE_REPORT_DAYS = 3
 
@@ -851,6 +856,20 @@ def main():
                     help="print only the never-deleted findings and exit")
     ap.add_argument("--self-test", action="store_true",
                     help="prove the protected paths are unreachable, then exit")
+    # -- archive mode ------------------------------------------------------
+    # Folded in from the former /atd-archive on 2026-08-26. A MOVE, never a
+    # delete: it frees no disk and every byte survives one directory deeper.
+    # It is a separate mode rather than another cleanable category precisely
+    # so --apply's delete path and the deny-list never see it, and so the
+    # reversible operation never inherits the irreversible one's ceremony.
+    ap.add_argument("--archive", action="store_true",
+                    help="fold dated artefacts into month folders (a move, "
+                         "not a delete — frees no disk; reverse with --restore)")
+    ap.add_argument("--archive-days", type=int, default=3, metavar="N",
+                    help="with --archive: fold artefacts older than N days "
+                         "(default 3)")
+    ap.add_argument("--restore", metavar="YYYY-MM",
+                    help="flatten one archived month folder back out")
     args = ap.parse_args()
 
     if args.keep_days < 0:
@@ -873,6 +892,22 @@ def main():
     if args.self_test:
         return self_test(args)
 
+    # Archive/restore are moves. They exit before build_plan() so no move can
+    # ever reach the deletion path, and --apply means "perform the moves" here
+    # rather than "delete", which is why they return rather than fall through.
+    if args.restore:
+        if not MONTH_RE.match(args.restore):
+            say(f"--restore wants YYYY-MM, got {args.restore!r}")
+            return 1
+        return archive_report(list(scan_restore(args.restore)), args.apply,
+                              "restore")
+    if args.archive:
+        if args.archive_days < 0:
+            say("--archive-days must be >= 0")
+            return 1
+        return archive_report(list(scan_archive(args.archive_days)),
+                              args.apply, "archive")
+
     say(f"root {ROOT}")
     say(f"mode {'APPLY' if args.apply else 'DRY RUN — nothing will be deleted'} "
         f"· retention {args.keep_days}d · categories "
@@ -887,8 +922,8 @@ def main():
     if moves:
         say(f"── archive — {len(moves)} dated file(s) could fold into month "
             f"folders, freeing the listing without deleting anything")
-        say(f"   run /atd-archive (or python3 tools/archive.py) — this tool "
-            f"will not move them")
+        say(f"   run `python3 tools/housekeeping.py --archive` to fold them "
+            f"— a move, not a delete; this run will not touch them")
         say()
 
     plan, refusals = build_plan(args)

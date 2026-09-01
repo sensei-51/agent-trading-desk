@@ -20,7 +20,13 @@
 
 ## Market snapshot
 
-Broad index · commodity references · the FX cross that moves your P&L · notable moves vs yesterday.
+**2–4 bullets, no table** (the per-instrument proxy table was removed 27 Aug 2026 — those levels already live in the facts sheet and the boards). Only what changed and what it means for the sleeve:
+
+- The one or two moves that actually matter today (index, commodity, or held-line), each with its consequence stated in the same bullet
+- GBP/USD — the cross that converts every USD line into sleeve P&L
+- Index tripwire (`rules/01_METHOD.md` #3): fired / not fired, one line
+
+If it isn't worth a bullet, it isn't worth a row.
 
 ## Geopolitical update
 
@@ -28,11 +34,25 @@ Top 1–2 active risks. Each rated **STABLE / ELEVATED / CRITICAL**, with the di
 
 ## Rotation read
 
-**ROTATION-IN:** <sectors> · **ROTATION-OUT:** <sectors> · **Persistence:** <streak / trend>
+*One table. One row per sector that carries a tag **or** a held weight, ranked by % NAV.
+No prose outside the legend and the sleeve line — the columns carry the reasoning.*
 
-**Sleeve implication:** X% of the sleeve sits in ROTATION-OUT sectors, Y% in ROTATION-IN. <Is the cap what blocks leaning in?>
+| Sector | Tag · Trend | Run | Sus | % NAV | Investable line |
+|---|---|---:|---|---:|---|
+| Shipping | ROTATION-IN · STRENGTHENING | 7 | 1/1 | 0.2% | INSW / ESEA |
+| Gold | — (gauge fallback) | — | 3/7 | 24.5% | SGLN.L |
+| CleanEnergy | ROTATION-OUT · STABLE | 7 | 0/4 | 0.7% | none → EXPANSION |
 
-**Investable line per ROTATION-IN sector:** <ticker> → gate card below (**ETF card** where the line is a fund). *If the bellwether table says `none`, that becomes this run's EXPANSION task.*
+*Tag qualifiers, stated once here and **not** repeated per row: **CHASING** → wait for pullback to
+150d, then re-check gates 1-8. **SUSTAINED** → already extended; single-line cap, no doubled ETF
+cap. **MIXED** → ETF gate 1 fails outright. **ROTATION-OUT / FADING-OUT / EXHAUSTED** → no new
+selling. The per-ticker qualifier still belongs on every CHASING gate card in the action board.*
+
+**Sleeve implication:** X% on the OUT side, Y% on the IN side. <Is the cap what blocks leaning in?>
+
+> **Excluded from this section by design:** raw persistence scores and 3-run averages (the trend
+> word carries it), per-sector £ figures (that is `## Sector X-ray`'s job), bucket-grouping prose,
+> and any restatement of what a tag means. An `Investable line` of `none` is this run's EXPANSION task.
 
 ---
 
@@ -40,16 +60,39 @@ Top 1–2 active risks. Each rated **STABLE / ELEVATED / CRITICAL**, with the di
 
 *Short fixed-width fields only. **Never put reasoning in a table cell.***
 
-> **Heading is load-bearing — do not rename.** This 3-column summary and the 8-column
+> **Heading is load-bearing — do not rename.** This 4-column summary and the 8-column
 > `## Conviction-ranked action board` below are two different sections. `tools/eval_reviewer.py`
 > and `tools/append_gate_ledger.py` bind to the board by heading; when the two headings were
 > near-duplicates (`Action board — conviction ranked` / `Conviction-ranked action board`) all
 > three consumers silently matched this one and read zero rows for four days.
 
-| Ticker | Px / Value | Signal |
-|---|---|---|
-| EXMPL | $118 / $12.4K | 🟢 BUY (capped) |
-| EXMP2 | $42 / $3.1K | 🟠 WAIT |
+| Ticker | Px / Value | Signal | Darkpool |
+|---|---|---|---|
+| EXMPL | $118 / $12.4K | 🟢 BUY (capped) | **bullish** $144.9M |
+| EXMP2 | $42 / $3.1K | 🟠 WAIT | via GLD: **bullish** $137.9M |
+| EXMP3 | £8.40 / £2.1K | 🔵 BUY-TRIGGER | `THIN` $69K |
+| EXMP4 | $61 / $4.0K | 🟠 WAIT | `unseen` |
+
+> **The `Darkpool` column carries no authority and never has.** Copy the cell verbatim
+> from `### Book` in `output/data/darkpool_<date>.md`, which is keyed by this same roster
+> ticker. **Fill it *after* the signal is decided** — it is an output of the run, not an
+> input to it. No gate consults it and no signal moves because of it (`docs/BACKLOG.md` D5).
+>
+> **The one thing it obliges:** where the cell disagrees with the signal, say so in Notes
+> and dismiss it on the record. A darkpool/card disagreement may no longer be silently
+> skipped. That is a disclosure duty, not a gate.
+>
+> **Seven states, none interchangeable.** `**bullish** $144.9M` direct · `via GLD: …` a
+> **proxy**, never first-hand · `` `THIN` $69K `` in the capture but below the floor —
+> *checked, quiet* · `` `no twin` `` §10 says it can never be seen — *checked* ·
+> `` `unseen` `` no row in the capture · `` `unmapped` ⚠️ `` absent from §10, nobody ever
+> decided · `—` the leg is ABSENT this run. **Never blank, and never `—` for anything but
+> an absent leg** — collapsing "checked and quiet" into "never looked" is the exact defect
+> item 9.1 exists to prevent.
+>
+> **This column measures unusual options premium, not accumulation**, and its direction is
+> *inferred* from where prints landed against the bid/ask. Read it as "premium leaned this
+> way, at this size, this session."
 
 ### Notes
 
@@ -132,13 +175,9 @@ YYYY-MM-DD … YYYY-MM-DD
 
 One paragraph. Specific tickers, specific amounts. **If no action is warranted, say so clearly and explain why** — "nothing to do today because X" is a complete and valid answer.
 
-## Stop loss review
+## Round-trip reviews
 
-- Positions within **5%** of a known stop
-- Large positions (>20% of sleeve NAV) with **no stop set** — *excluding signal-ruled lines*
-- **Signal-ruled lines**, listed explicitly as `signal-ruled (150d @ <level>)`, flagged when price approaches that line. *Exempt from the flag above, never from this list — an invisible exemption reads exactly like a forgotten stop.*
-- Stops that should be **raised** after a gain, with the suggested new level
-- **Round-trip reviews:** every held position flagged `ROUND-TRIP-RISK` — keep/exit call **with a written trigger level**. *A missing row here is a missed mandatory review.*
+Every held position flagged `ROUND-TRIP-RISK` — keep/exit call **with a written trigger level**. *A missing row here is a missed mandatory review.* (The per-position stop audit that used to live here was removed 27 Aug 2026: every stop pair already lives on its name in the Held positions summary and Notes, and `eval_reviewer` check [13] enforces presence and ordering mechanically. Signal-ruled lines stay visible as `signal-ruled (150d @ <level>)` in the Held positions summary — an invisible exemption reads exactly like a forgotten stop.)
 
 ## Proactive screening
 

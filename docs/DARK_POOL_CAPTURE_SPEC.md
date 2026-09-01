@@ -242,13 +242,39 @@ Documented here so a new provider knows which fields are actually read.
 
 ## 9. Limits inherent to options-derived darkpool
 
+> **⚠️ Read this before the word "darkpool" anywhere else in the repo.**
+>
+> **This leg measures unusual options premium. It does not measure dark-pool block
+> accumulation.** The two are not the same thing and the name is misleading. The
+> dark-pool leaderboard is the **discovery route** — how tickers are found — and the
+> quantity recorded against each one is options premium. The capture's own method line
+> says so: `basis=unusual_options; discovery=darkpool_leaderboard_top30_each_way`.
+>
+> **And direction is inferred, not observed.** The platform assigns an initiating side to
+> each print from where it landed against the bid/ask. That inference is not the trader's
+> intent: a bought call may be a hedge against a short, or one leg of a spread whose other
+> legs were priced separately, or a roll. The recorded case is in the bullet list below —
+> on 20 Aug 2026 **SLV showed $28M of calls against $18M of puts while the single largest
+> print was a $12M December put**, and SLV read 90% bullish five days later.
+>
+> **So a `bullish` row means one thing only:** *options premium leaned this way, at this
+> size, in this session.* It does **not** mean institutions are quietly accumulating, that
+> anyone is positioned for a move, or that the money is informed. Any consumer — human or
+> agent — that imports the accumulation model is reading something the numbers do not
+> support, and every downstream use of the word "predictive" inherits that error.
+
 These are properties of the data class, not of any vendor. A replacement source will have
 them too, and the reason D5 declined to make this leg a backbone is here:
 
-- **Coverage is structurally poor on the names this sleeve actually trades.** 8 of 10
-  backfilled decisions read `THIN`. Darkpool is blind on small caps, thinly-followed
-  names and quiet UK lines. **A backbone cannot abstain on the majority of the book; an
-  overlay can.**
+- **Coverage is structurally poor on the names this sleeve actually trades.** Measured
+  26 Aug 2026 against the best capture that has ever existed here (120 rows, 67 above the
+  floor): **6 direct reads across 38 held lines — 15%.** Seventeen more are proxies and
+  fifteen have no reading at all. Independently, the ledger backfill scores 16 decisions
+  and **11 of them are `THIN`**. Darkpool is blind on small caps, thinly-followed names
+  and quiet UK lines. **A backbone cannot abstain on the majority of the book; an overlay
+  can.** *(An earlier version of this bullet cited "8 of 10 backfilled decisions" — that
+  was measured on a five-row sample and should not be quoted; the figures above are
+  re-measured and are what `tools/darkpool.py` now prints on every run.)*
 - **No LSE-native darkpool.** Every GBP line is read through a US twin — a proxy, and it must be
   labelled one on every row where it is used.
 - **End-of-day only.** A pre-market run reads yesterday's session.

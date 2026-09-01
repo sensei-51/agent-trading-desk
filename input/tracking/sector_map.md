@@ -53,6 +53,7 @@ means the roster carries no vehicle: finding one becomes that run's EXPANSION ta
 | Index | — | ISF.L · CNX1.L · EQQU.L · XDEW.L (all roster) | Indices are their own bellwethers. Broad US/UK market beta only — a single-country, factor, leveraged or fixed-income vehicle belongs in its own bucket (see Japan, added 22 Aug 2026) |
 | Japan | EWJ | IJPN.L (roster) | iShares MSCI Japan. Split from Index 22 Aug 2026: a single-country bet was sitting in a bucket that has no gauge, so member composition alone drove its read. One member — treat the In/Out count as an anecdote and lean on the gauge, per the caution above |
 | Materials | XLB | LIN stock — no ETF line adopted (SXLB USD line exists, unverified) | Broad; REMX closer for critical metals |
+| Mexico | EWW | CMX1.L (roster) | iShares MSCI Mexico Capped — US twin of the held CMX1 line. Single-country bucket per the Japan precedent (22 Aug 2026); added 27 Aug 2026 when CMX1 entered the book. One member — treat the In/Out count as an anecdote and lean on the gauge, per the caution above |
 | MegaTech | MAGS | via index lines (CNX1.L/EQQU.L/XDEW.L) | Roundhill Magnificent Seven |
 | Quantum | QTUM | QANT.L — speculative territory | Defiance Quantum & Machine Learning |
 | Rail | IYT | NSC stock — structurally stock-only, no pure-rail ETF exists | Transports proxy |
@@ -110,11 +111,13 @@ differently.*
 | CCJ | Uranium |
 | CDE | Gold |
 | CEG | AIInfra |
+| CF | Agri |
 | CGAU | Gold |
 | CGG.TO | Gold |
 | CHD | Defensive |
 | CHG.L | Defence |
 | CLBT | GrowthSW |
+| CMX1 | Mexico |
 | CNX1.L | Index |
 | COMM.L | Materials |
 | CP | Rail |
@@ -147,6 +150,7 @@ differently.*
 | FNV | Gold |
 | FSM | Gold |
 | FWRG.L | Index |
+| GDGB | Gold |
 | GEV | AIInfra |
 | GIGB.L | Materials |
 | GLW | Semis |

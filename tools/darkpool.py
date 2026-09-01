@@ -7,12 +7,26 @@ WHAT THIS STEP DOES AND DELIBERATELY DOES NOT DO
   providers `input/config/providers.json` names, and writes them to
   `output/data/darkpool_<date>.md`.
 
-  It changes **no gate, no cap, no signal and no tag**. Nothing in the Trader's
-  card reads this file yet. That is the point: the legs start producing data,
-  and the parallel run in `docs/DARKPOOL_FIRST_PROPOSAL.md` Phase 3 gets something
-  to score, without a single decision moving on one day of evidence.
+  It changes **no gate, no cap, no signal and no tag**. No gate card reads this
+  file, by decision: darkpool is a permanent optional overlay (`docs/BACKLOG.md`
+  D5) and the radar's rotation read is what ETF gate 1 consults. That is not a
+  phase waiting to end — it is the settled shape of the leg.
 
-  The rotation read remains what ETF gate 1 consults. See Phase 4.
+WHAT THIS LEG MEASURES, AND WHAT IT DOES NOT
+  It measures **unusual options premium**. It does not measure dark-pool block
+  accumulation. The dark-pool leaderboard is the *discovery route* — how tickers
+  are found — and the quantity recorded against each one is options premium
+  (`method: basis=unusual_options; discovery=darkpool_leaderboard_...`).
+
+  Direction is **inferred, not observed**: the platform assigns the initiating
+  side from where a print landed against the bid/ask. A bought call may be a
+  hedge against a short, or one leg of a spread priced separately. Observed
+  20 Aug 2026: SLV showed $28M of calls against $18M of puts while the single
+  largest print was a $12M December put.
+
+  So a `bullish` cell means *"options premium leaned this way, at this size, in
+  this session"* — never *"institutions are quietly accumulating."* See
+  `docs/DARK_POOL_CAPTURE_SPEC.md` §9.
 
 GBP LINES ARE RESOLVED THROUGH THE TWIN TABLE, AND LABELLED AS PROXIES
   Darkpool is US market structure: `SILG.L` has no darkpool, `SIL` does. Most of
@@ -34,10 +48,11 @@ THE SIGNIFICANCE FLOOR IS RENDERED HERE, OWNED ELSEWHERE
   Rows below the floor are marked `THIN` — not bullish, not bearish, *not
   enough money to constitute an observation*.
 
-  The number lives here as a rendering constant only. When Phase 4 lets a gate
-  consult it, it moves to `rules/` where the other bars live, and this constant
-  becomes an import. Do not let a rule quietly take up permanent residence in
-  a reporting script.
+  The number lives here as a rendering constant only. No gate consults it and
+  none is going to (D5), so it stays a display threshold on an overlay — a wrong
+  value mislabels a row rather than deciding a trade. `docs/BACKLOG.md` item 10
+  demoted it for exactly that reason. If it ever does move, it moves to the
+  capture spec, not to `rules/`.
 
 STALENESS
   Both legs are `browser`-ingested, so both carry `max_age_days`. The check
@@ -202,6 +217,122 @@ def twin_index(held, twins, tiers):
     return out
 
 
+# ---------------------------------------------------------------- the book
+#
+# SEVEN STATES, AND WHY NONE OF THEM MAY BE COLLAPSED
+#   The `### Book` table below is keyed by ROSTER TICKER — the `.L`-suffixed form
+#   the Trader's board uses — so a darkpool cell can be copied out rather than
+#   derived by hand from a US-keyed table plus a second lookup into §10. That
+#   second lookup is the one a hurried reader fudges to "—", and the fudge is
+#   indistinguishable from a real absence.
+#
+#   | Cell           | Means                                                    |
+#   |----------------|----------------------------------------------------------|
+#   | bullish $144M  | direct read, at or above the floor                       |
+#   | via GLD: …     | PROXY — a non-US line read through its §10 twin          |
+#   | `THIN` $0      | in the capture, below the floor — CHECKED, quiet         |
+#   | `no twin`      | §10 maps it to None — CHECKED, cannot ever be seen       |
+#   | `unseen`       | no row in the capture. Says nothing about the bridge     |
+#   | `unmapped` ⚠️  | a dotted line ABSENT from §10 — nobody ever decided      |
+#   | —              | the whole leg is ABSENT this run                         |
+#
+#   `unseen` and `unmapped` are the pair that matters. Measured 26 Aug 2026, of
+#   the 20 book lines with no capture row, ZERO were bridge failures: nine were
+#   plain US tickers, which never consult §10 at all; three crossed the bridge
+#   perfectly and then found the twin itself missing from the capture; and the
+#   rest were not tickers at all. So `unseen` is a property of
+#   the CAPTURE, not of the bridge.
+#
+#   `unmapped` is the guard for item 9.1's still-open half: an unlisted `.L` line
+#   otherwise falls through, is looked up under its own LSE ticker, finds nothing
+#   and renders exactly like a name that was checked and found quiet. Zero roster
+#   lines are in that state today; nothing warned if one appeared. Now something
+#   does.
+#
+#   A NOTE ON THE FOURTH STATE'S HONESTY. `unseen` is genuinely ambiguous — the
+#   capture format uses two conventions at once. 23 of its 120 rows are explicit
+#   zeros (`ESEA`, `EWJ`, `XLY`…), which is the vendor saying "looked, found
+#   nothing"; other roster names are simply absent despite the method line
+#   claiming a roster sweep. Nothing can separate "swept, quiet" from "never
+#   swept" for those. Fixing that is a capture-spec change, not a code change.
+
+def direction_read(pb):
+    """Four-way premium-lean read (decision 2026-08-27): strength is still lean,
+    never conviction — the §9 caveat applies to a 🟩🟩 exactly as it did to bold."""
+    if pb is None:
+        return "—"
+    if pb >= 80:
+        return "🟩🟩 **bullish-strong**"
+    if pb >= 60:
+        return "🟩 **bullish-weak**"
+    if pb <= 20:
+        return "🟥🟥 **bearish-strong**"
+    if pb <= 40:
+        return "🟥 **bearish-weak**"
+    return "mixed"
+
+
+READ_LEGEND = ("*Reads: 🟩🟩 ≥80% bullish · 🟩 60–79% · mixed 41–59% · "
+               "🟥 21–40% · 🟥🟥 ≤20% — premium lean, per the caveat above.*")
+
+
+def book_cell(ticker, rows, twins, leg_ok):
+    """(cell, state) for one roster line. The seven states above, never fewer."""
+    if not leg_ok:
+        return "—", "leg-absent"
+
+    look, proxy = ticker, None
+    if "." in ticker:                       # a non-US line has to cross the bridge
+        if ticker not in twins:
+            return "`unmapped` ⚠️", "unmapped"
+        if twins[ticker] is None:
+            return "`no twin`", "no-twin"
+        look, proxy = twins[ticker], ticker
+
+    r = rows.get(look)
+    if r is None:
+        return "`unseen`", "unseen"
+
+    tot = r.get("premium_usd") or 0.0
+    if tot < SIGNIFICANCE_FLOOR_USD:
+        body, state = f"`THIN` {money(tot)}", "thin"
+    else:
+        pb = r.get("pct_bullish")
+        body = direction_read(pb) + f" {money(tot)}"
+        state = "read"
+    # In a book-keyed table the row IS the held line, so naming it again says
+    # nothing — name the TWIN that was actually read instead.
+    return (f"via {look}: {body}", "proxy-" + state) if proxy else (body, state)
+
+
+def load_book():
+    """[(roster ticker, membership)] — the same assembly the radar and facts use.
+
+    Deliberately NOT `held_symbols()`. Broker exports carry bare symbols and,
+    worse, SEDOL-style codes and cash lines. Those are not tickers, darkpool
+    cannot have an opinion on them, and keying the book table on them renders
+    rows of confident `unseen` about a cash balance.
+    The roster loader resolves to the `.L`-suffixed ticker the board uses.
+    """
+    try:
+        sys.path.insert(0, os.path.join(ROOT, "engine"))
+        import heartbeat_radar as hr                        # noqa: PLC0415
+        smap = hr.load_sector_map()
+        seen, out = set(), []
+        for tk, _sector, _sym, _basis in hr.load_roster(smap=smap)[0]:
+            if tk not in seen:
+                seen.add(tk)
+                out.append((tk, "held"))
+        for tk, _src, spec in hr.load_watchlists(smap=smap):
+            if tk not in seen:
+                seen.add(tk)
+                out.append((tk, "spec" if spec else "watch"))
+        return out, []
+    except Exception as e:                                  # noqa: BLE001
+        return [], [f"roster unavailable ({type(e).__name__}: {e}) — the Book table "
+                    f"cannot be rendered; the By-ticker table below is unaffected"]
+
+
 def held_mark(ticker, held, via):
     """✅ for a direct holding · `via XXX.L` for one reached through a twin.
 
@@ -249,16 +380,26 @@ def call(p, ctx):
 
 # ---------------------------------------------------------------- render
 
-def render(darkpool, fl_name, conv, cv_name, held, via, warnings):
+def render(darkpool, fl_name, conv, cv_name, held, via, book, warnings):
     today = datetime.date.today().isoformat()
-    L = [f"# Darkpool & conviction — {today}", ""]
+    L = [f"# 🐋 Darkpool & conviction — {today}", ""]
     L += ["*Whole-book legs, rendered for the agents as **context only**. No gate "
           "card reads this file, by decision — darkpool is a permanent optional "
           "overlay and the rotation read drives ETF gate 1 (`docs/BACKLOG.md` D5). "
-          "Capture format: `docs/DARK_POOL_CAPTURE_SPEC.md`.*", ""]
+          "Capture format: `docs/DARK_POOL_CAPTURE_SPEC.md`.*", "",
+          "> **What this leg measures.** **Unusual options premium — not dark-pool "
+          "block accumulation.** The dark-pool leaderboard is the *discovery route*; "
+          "the recorded quantity is options premium. Direction is **inferred**, not "
+          "observed: the platform assigns the initiating side from where a print "
+          "landed against the bid/ask, and a bought call may be a hedge against a "
+          "short or one leg of a spread priced separately. On 20 Aug 2026 SLV showed "
+          "$28M of calls against $18M of puts while the single largest print was a "
+          "$12M December put. **Read a `bullish` cell as \"premium leaned this way, "
+          "at this size, this session\" — never as \"institutions are accumulating.\"** "
+          "`docs/DARK_POOL_CAPTURE_SPEC.md` §9.", ""]
 
     # ---- darkpool -----------------------------------------------------------
-    L += ["## Darkpool", ""]
+    L += ["## 🐋 Darkpool", ""]
     if not darkpool or darkpool.get("status") == "NONE":
         L += [f"**ABSENT** — provider `{fl_name}`. "
               + ((darkpool or {}).get("notes") or ["no provider configured"])[0], ""]
@@ -288,7 +429,7 @@ def render(darkpool, fl_name, conv, cv_name, held, via, warnings):
                   f"*Held: ✅ = the book holds this line · `via XXX.L` = the book holds a "
                   f"GBP line that has no US darkpool of its own, read here through its twin "
                   f"(`docs/DARK_POOL_CAPTURE_SPEC.md` §10) — a **proxy**, never a direct "
-                  f"measurement.*", "",
+                  f"measurement.* " + READ_LEGEND, "",
                   "| Ticker | Held | Bullish | Calls | Puts | Total | Read |",
                   "|---|---|---|---|---|---|---|"]
             for t, d in sorted(rows.items(),
@@ -297,10 +438,7 @@ def render(darkpool, fl_name, conv, cv_name, held, via, warnings):
                 if tot < SIGNIFICANCE_FLOOR_USD:
                     read = "`THIN`"
                 else:
-                    pb = d.get("pct_bullish")
-                    read = ("—" if pb is None else
-                            "**bullish**" if pb >= 60 else
-                            "**bearish**" if pb <= 40 else "mixed")
+                    read = direction_read(d.get("pct_bullish"))
                 L.append(f"| {t} | {held_mark(t, held, via)} | {pct(d.get('pct_bullish'))} "
                          f"| {money(d.get('call_premium_usd'))} | {money(d.get('put_premium_usd'))} "
                          f"| {money(tot)} | {read} |")
@@ -308,6 +446,59 @@ def render(darkpool, fl_name, conv, cv_name, held, via, warnings):
         for n in darkpool.get("notes") or []:
             L.append(f"- {n}")
         L.append("")
+
+    # ---- book ---------------------------------------------------------------
+    # OUTSIDE the if/else above, deliberately. A run with `darkpool: none` must
+    # still produce a complete book — every row reading `—`, none blank, none
+    # missing. That is D5's standing test and 29.1's acceptance criterion: the
+    # run loses the reading, never the row.
+    if book:
+        leg_ok = bool(darkpool and darkpool.get("status") != "NONE")
+        rows = (darkpool or {}).get("tickers") or {}
+        twins = book["twins"]
+        L += ["### Book", "",
+              "*Keyed by **roster ticker** — the form the Trader's board uses — so a "
+              "darkpool cell is copied out, not derived. `via XXX` names the US twin "
+              "a non-US line was read through: a **proxy**, never a direct "
+              "measurement. The seven states are distinct on purpose — `THIN` and "
+              "`no twin` mean **checked**, `unseen` means the capture has no row, and "
+              "`unmapped` means the line is absent from "
+              "`docs/DARK_POOL_CAPTURE_SPEC.md` §10 and nobody ever decided.* "
+              + READ_LEGEND, "",
+              "| Line | In book | 🐋 Darkpool |", "|---|---|---|"]
+        tally, held_tally = {}, {}
+        for ticker, membership in book["rows"]:
+            cell, state = book_cell(ticker, rows, twins, leg_ok)
+            tally[state] = tally.get(state, 0) + 1
+            if membership == "held":
+                held_tally[state] = held_tally.get(state, 0) + 1
+            L.append(f"| {ticker} | {membership} | {cell} |")
+        L.append("")
+
+        # The abstention rate, per run rather than hand-computed once. This is the
+        # number that governs whether item 29.3 may ever be built, and it is
+        # reported over HELD LINES — D5's reason is that a backbone cannot abstain
+        # on the majority of the book, and the watchlist is not the book. Quoting a
+        # roster-wide figure is what made 29.2's premise ("67 above the floor") read
+        # the opposite way from the truth.
+        def line(tal, label):
+            n = sum(tal.values())
+            direct = tal.get("read", 0)
+            proxy = sum(v for k, v in tal.items() if k.startswith("proxy-"))
+            return (f"**{label}: {n} lines — {direct} direct "
+                    f"({direct * 100 // n if n else 0}%), {proxy} via a proxy, "
+                    f"{n - direct - proxy} no reading.**")
+
+        L += [line(held_tally, "Coverage of the book (held)"), "",
+              line(tally, "Coverage of the roster (held + watchlist)"), "",
+              "*States: " + " · ".join(f"`{k}` {v}" for k, v in sorted(tally.items()))
+              + ".*", "",
+              "> A **direct** read is the only kind that is first-hand. Proxies are "
+              "sector context, and several book lines can share one — four separate "
+              "Nasdaq-100 lines all read the same `QQQ` row. "
+              "**Display may repeat an observation; arithmetic may not.**", ""]
+    for w in book.get("warnings", []) if book else []:
+        L.append(f"- ⚠️ {w}")
 
     # ---- conviction ------------------------------------------------------
     L += ["## Conviction", ""]
@@ -385,7 +576,20 @@ def main():
     twins, tiers, tw_warn = load_twins()
     warnings += tw_warn
     via = twin_index(held, twins, tiers)
-    text = render(darkpool, fl_name, conv, cv_name, held, via, warnings)
+
+    book_rows, book_warn = load_book()
+    book = {"rows": book_rows, "twins": twins, "warnings": book_warn} if book_rows else None
+    warnings += book_warn
+    # An unmapped dotted line is item 9.1's silent gap. It renders `unmapped` in the
+    # table; it also has to reach the operator, or the table is the only place it
+    # is ever said and nobody re-reads a 99-row table.
+    unmapped = sorted(t for t, _ in book_rows if "." in t and t not in twins)
+    if unmapped:
+        warnings.append(f"{len(unmapped)} roster line(s) absent from the §10 twin table "
+                        f"— darkpool cannot resolve them and never said so until now: "
+                        f"{', '.join(unmapped)}")
+
+    text = render(darkpool, fl_name, conv, cv_name, held, via, book, warnings)
 
     os.makedirs(a.out_dir, exist_ok=True)
     today = datetime.date.today().isoformat()

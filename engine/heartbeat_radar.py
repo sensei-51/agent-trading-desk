@@ -378,7 +378,8 @@ EXCHANGE_SUFFIX = {
 # the disambiguating letters and nothing else — "CA$", "A$", "HK$" — so the letters
 # are the entire signal.
 DOLLAR_PREFIXES = (("CA$", "CAD"), ("AU$", "AUD"), ("HK$", "HKD"),
-                   ("NZ$", "NZD"), ("SG$", "SGD"), ("A$", "AUD"), ("S$", "SGD"))
+                   ("NZ$", "NZD"), ("SG$", "SGD"), ("C$", "CAD"), ("A$", "AUD"),
+                   ("S$", "SGD"))
 
 # Sterling markers. GBp (pence) is the LSE quoting convention; a holding priced in it
 # is an LSE line whatever else the export says.
@@ -974,6 +975,31 @@ def pick_column(headers, candidates, exclude=()):
     return None
 
 
+def row_symbol(row, tkcol, ncol=None):
+    """The ticker for a holdings row, or "" when the row is not a holding.
+
+    An empty ticker cell means two opposite things. A "Totals" or currency-split
+    row is not a holding and must stay out of NAV. An uninvested cash balance IS
+    one — AJ Bell names it ("Cash GBP") and assigns it no ticker at all. Dropping
+    both alike removed the entire uninvested cash balance from NAV on 2026-09-01:
+    an understatement of 17.2% that carried into every %-of-NAV the gate cards
+    read, including the Gold bloc headroom, which is sized in pounds against a
+    ceiling.
+
+    Every reader must share this. tools/xray.py and tools/checks.py compare their
+    NAVs against each other, so a second hand-written copy of the rule would let
+    them agree while both were wrong — which is precisely how the whole AJ Bell
+    file went missing from both sides at once (see check_brokers_readable).
+    """
+    sym = (row.get(tkcol) or "").strip().upper()
+    if sym:
+        return sym
+    name = (row.get(ncol) or "").strip() if ncol else ""
+    if not re.match(r"^cash\b", name, re.I):
+        return ""
+    return re.sub(r"[^A-Z0-9]", "", name.upper())
+
+
 def read_csv_rows(path):
     """CSV rows as dicts. Tolerant of stacked BOMs and of a preamble above the header.
 
@@ -1217,9 +1243,22 @@ def map_form(sym, smap):
     return hits[0] if len(hits) == 1 else None
 
 
-def map_sector(sym, smap):
-    """sector_map.md's sector for a broker symbol, in whichever form the map lists it."""
-    return smap.get(sym) or smap.get(map_form(sym, smap) or "")
+def map_sector(sym, smap, usec=None):
+    """sector_map.md's sector for a broker symbol, in whichever form the map lists it.
+
+    With `usec` (from load_universe_sectors) the tracking files' Sector column is
+    consulted when the map has no row — the documented second step of the
+    resolution order. sector_map.md always wins where it carries the ticker.
+    Callers passing no `usec` get sector_map.md alone, exactly as before.
+
+    map_form is reused against `usec` for the same reason it exists for the map:
+    a broker symbol arrives bare (`GDGB`) where the tracking row spells it
+    suffixed (`GDGB.L`), and matching only the literal string would miss it.
+    """
+    sec = smap.get(sym) or smap.get(map_form(sym, smap) or "")
+    if sec or not usec:
+        return sec
+    return usec.get(sym) or usec.get(map_form(sym, usec) or "")
 
 
 def resolve_ticker(sym, name, currency, smap):
@@ -1538,6 +1577,49 @@ def load_sector_map(here=None):
                 and re.fullmatch(r"[A-Z0-9][A-Z0-9.\-]{0,9}", cells[0])):
             m[cells[0]] = cells[1].lstrip("@")
     return m
+
+
+def load_universe_sectors(smap=None, here=None):
+    """ticker -> sector from the SECOND column of every input/tracking/*.md row.
+
+    The documented resolution order is sector_map.md -> this -> Unclassified, and
+    sector_map.md's own header has stated it since the file was created. Only the
+    radar actually applied it, through a local `inline` dict it built while
+    walking the tracking files for ticker membership; nothing else could see that,
+    so tools/xray.py and tools/checks.py filed a held name that universe.md
+    classifies perfectly well as Unclassified. This is that fallback, in one
+    place, for every caller (backlog #30).
+
+    ONLY SECTORS sector_map.md ALREADY NAMES ARE ACCEPTED. The tracking table was
+    `| Ticker | Source | Notes |` until 2026-08-23 and its second cell carried
+    strings like "YouTube - mega-cap AI infra 12 Aug 26"; read verbatim, a row
+    left over from that shape files its ticker under a sector named after a
+    video. universe.md warns about exactly this in bold, and item 23 is the same
+    trap. Restricting the fallback to the map's existing vocabulary makes it
+    impossible, and stops a typo ("Semiconductors" for "Semis") quietly splitting
+    one bloc into two. A tracking row may REUSE a sector; only sector_map.md may
+    create one. All 40 tracking rows present on 2026-09-01 pass, so the rule
+    costs nothing today and only ever refuses a cell that was not a sector.
+    """
+    smap = load_sector_map(here) if smap is None else smap
+    vocab = set(smap.values())
+    out = {}
+    for tf in discover_tracking_files(os.path.join(INPUT_DIR, "tracking")):
+        for cells in md_table_rows(tf):
+            tk = cells[0]
+            if len(cells) < 2 or not cells[1]:
+                continue
+            if not re.fullmatch(r"[A-Z0-9][A-Z0-9.\-]{0,9}", tk):
+                continue
+            sec = cells[1].lstrip("@")
+            if sec not in vocab:
+                continue
+            # Same suffix rule the tracking loop in main() uses, so both paths
+            # key on the same spelling of the ticker.
+            if tk not in smap:
+                tk = map_form(tk, smap) or tk
+            out[tk] = sec
+    return out
 
 
 def load_bellwethers(here=None):
@@ -2532,8 +2614,12 @@ def main():
     # name that is both held and on a watchlist reports as held. Sector comes from
     # sector_map.md first, then the tracking file's inline tag, then Unclassified.
     smap = load_sector_map(here)
+    # The tracking files' Sector column, loaded once up front. This used to be an
+    # `inline` dict filled in as the tracking loop walked those same rows, which
+    # meant the fallback existed only inside this function — see
+    # load_universe_sectors for what that cost xray.py and checks.py.
+    usec = load_universe_sectors(smap, here)
     tickers, sectors, provenance = [], {}, {}
-    inline = {}
 
     def add(tk, prov, sec_hint=None):
         rank = {"tracking": 0, "watchlist": 1, "held": 2}
@@ -2542,7 +2628,7 @@ def main():
             provenance[tk] = prov
         elif rank[prov] > rank[provenance[tk]]:
             provenance[tk] = prov
-        sectors[tk] = smap.get(tk) or inline.get(tk) or sec_hint or "Unclassified"
+        sectors[tk] = smap.get(tk) or usec.get(tk) or sec_hint or "Unclassified"
 
     # Tracking pool — read every *.md in input/tracking/ (skip README.md). Two
     # swimlanes (17 Aug 2026):
@@ -2566,9 +2652,6 @@ def main():
             # actually about (CA$33.21), sat in the map unread.
             if tk not in smap:
                 tk = map_form(tk, smap) or tk
-            sec = cells[1].lstrip("@") if len(cells) >= 2 and cells[1] else None
-            if sec:
-                inline[tk] = sec
             add(tk, "tracking")
 
     # Held positions must be screened even if nobody remembered to list them — this is

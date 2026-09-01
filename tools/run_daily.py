@@ -77,9 +77,11 @@ STEPS = [
     ("radar", [PY, "engine/heartbeat_radar.py"]),
     ("facts", [PY, "tools/facts.py"]),
     ("fundamentals", [PY, "tools/fundamentals.py"]),
-    # Whole-book legs. Behaviour-neutral by design: renders darkpool and conviction
-    # for the agents to read; no gate consults it yet — ETF gate 1 is still the
-    # radar's rotation read. See docs/DARKPOOL_FIRST_PROPOSAL.md Phase 1 vs Phase 4.
+    # Whole-book legs. Behaviour-neutral by decision, not by phase: renders darkpool
+    # and conviction for the agents to read, and no gate consults either — ETF gate 1
+    # is the radar's rotation read. darkpool is a permanent optional overlay
+    # (docs/BACKLOG.md D5); a run with the leg absent must still produce a complete
+    # board, which is that decision's standing test.
     ("darkpool", [PY, "tools/darkpool.py"]),
     ("xray", [PY, "tools/xray.py"]),
     ("checks-post", [PY, "tools/checks.py", "--post"]),

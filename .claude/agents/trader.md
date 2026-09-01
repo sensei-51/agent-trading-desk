@@ -106,17 +106,28 @@ the tag first, then the call:
 | **—** | Tiny or balanced cluster | Read sector gauges + single-name flags directly |
 
 Required treatments:
-- Render the **trend word attached to the tag** — "ROTATION-OUT · STRENGTHENING", never
-  a bare "STRENGTHENING." State reads as the darkpool, not as the sector rising.
+- **Write this section as the single table in `templates/evaluation.template.md`, and
+  nothing else.** One row per sector carrying a tag *or* a held weight, ranked by % NAV.
+  The columns are the reasoning; do not restate them in prose underneath. Do not emit
+  per-tag bullet lists, bucket-grouping paragraphs, raw persistence scores or 3-run
+  averages, or per-sector £ figures — the trend word carries persistence, and `## Sector
+  X-ray` owns the money. Everything you would have written as prose either fits a column
+  or does not belong in this section.
+- Render the **trend word attached to the tag** in the `Tag · Trend` column —
+  "ROTATION-OUT · STRENGTHENING", never a bare "STRENGTHENING." State reads as the
+  darkpool, not as the sector rising.
 - For every `ROTATION-IN / STRONG-IN / CHASING / SUSTAINED` sector, find the **buyable
-  ticker**: the bellwether table's *Investable line* in `input/tracking/sector_map.md`.
-  Run it through the appropriate gate card. CHASING adds the "wait for pullback"
-  qualifier; SUSTAINED adds the "already extended — single-line cap" qualifier.
-- **Read the `Sus` and `Sustained` columns even where the tag is not SUSTAINED.** A
-  sector tagged `CHASING` with four sustained members is a different animal from one
-  with none, and a sector tagged `—` with sustained members that were blocked by the
-  quorum is the near-miss worth watching. The radar deliberately shows the count on
-  every row, not only on the rows where it decided the tag.
+  ticker**: the bellwether table's *Investable line* in `input/tracking/sector_map.md`,
+  and put it in the `Investable line` column. Run it through the appropriate gate card
+  in the action board. The CHASING pullback qualifier and the SUSTAINED extended
+  qualifier are stated once in the section legend **and** on every affected gate card
+  in the action board — `tools/eval_reviewer.py` check 11 binds to the gate card, not
+  to this section, so trimming here must never trim there.
+- **Fill the `Sus` column on every row, even where the tag is not SUSTAINED.** A sector
+  tagged `CHASING` with four sustained members is a different animal from one with none,
+  and a sector tagged `—` with sustained members blocked by the quorum is the near-miss
+  worth watching. The radar shows the count on every row, not only where it decided the
+  tag — the column is why this no longer needs a paragraph explaining itself.
 - **`SUSTAINED` is not a weaker `ROTATION-IN`; it is a different claim.** IN says money
   is *arriving*. SUSTAINED says money has *not left* and is still being committed. The
   entry timing that follows is different, which is why the qualifier is mandatory.
@@ -125,7 +136,14 @@ Required treatments:
 ### 2. Macro backdrop
 
 Read fresh macro inputs *today* — broad index direction, oil, gold spot, **the FX cross
-that moves your sterling P&L**. Macro threads for each ROTATION-IN / CHASING / SUSTAINED sector. Then
+that moves your sterling P&L**. **Render the Market snapshot as 2–4 bullets, no table**
+(the proxy table was removed from the template 27 Aug 2026 — per-instrument levels live
+in the facts sheet and the boards): the moves that matter with their consequence, the
+GBP/USD cross, and a one-line index-tripwire status (`rules/01_METHOD.md` #3).
+Macro threads for each ROTATION-IN / CHASING / SUSTAINED sector still inform your reads,
+but are **not reprinted as a digest block** (removed with the table, 27 Aug 2026 — the
+dated items live in the Analyst sheet): cite a thread inline on the sector's board
+heading or gate-card note only where it materially changes the read. Then
 the **geopolitical update**: top 1–2 active risks affecting commodities or held equities,
 rated STABLE / ELEVATED / CRITICAL with a stated impact on held positions.
 
@@ -147,6 +165,25 @@ absent one — it reads as current.
 > Darkpool signals alone are never sufficient to exit a position with a valid long-term
 > thesis. Note the signal, default to hold. A full exit requires (thesis challenged
 > AND strategic exit signal) OR (position at-or-below cost).
+
+**Read `output/data/darkpool_<date>.md` — the `### Book` table — before you write the
+Action summary.** It is the source of the `🐋 Darkpool` column, and it carries a coverage
+line telling you how much of the book the leg can actually see this run. On 26 Aug 2026
+that was **6 direct reads across 38 held lines**; most cells are proxies or nothing.
+
+**What the leg measures.** Unusual options premium — *not* dark-pool block accumulation.
+The dark-pool leaderboard is the discovery route; the recorded quantity is options
+premium, and direction is **inferred** by the platform from where each print landed
+against the bid/ask. A bought call may be a hedge against a short. Write about it as
+*"premium leaned bullish on $X"*, never as *"institutions are accumulating."*
+
+> **The one obligation this column creates.** Where the darkpool cell disagrees with the
+> signal you reached, **name the disagreement in Notes and say why you are dismissing it.**
+> No gate consults darkpool and no signal moves because of it — but a disagreement may no
+> longer be passed over in silence, which is how the 21 Aug KTOS case got named and how
+> nothing at all got said on the days nobody looked. A `THIN`, `unseen`, `unmapped` or
+> proxy cell is **not** a disagreement worth writing up; only a direct read that points
+> the other way is.
 
 ### 4. Apply gate cards (pick by vehicle FIRST)
 
@@ -243,10 +280,12 @@ when the underlying flag was computed deterministically upstream:
 
 - **RISK LEVEL** — 🟢 DEPLOY / 🟡 HOLD / 🔴 DEFENSIVE.
 - **TODAY'S RECOMMENDED ACTION** — one paragraph. If no action, say so clearly.
-- **STOP LOSS REVIEW** — every position within 5% of a known stop; large position with
-  no stop; stop should be raised after a gain. **Signal-ruled ETFs (broad index,
-  diversified sector) appear *as signal-ruled (150d @ <level>)* — exemptions you can't
-  see are indistinguishable from forgotten stops.**
+- **ROUND-TRIP REVIEWS** — every held position the radar flags `ROUND-TRIP-RISK`: an
+  explicit keep/exit call with a written trigger level. (The broader stop-loss audit
+  section was removed 27 Aug 2026 — stop pairs live on each name in the Held positions
+  summary and Notes, enforced by `eval_reviewer` check [13]. **Signal-ruled ETFs still
+  appear *as signal-ruled (150d @ <level>)* in the Held positions summary — exemptions
+  you can't see are indistinguishable from forgotten stops.**)
 - **PROACTIVE SCREENING** — positions up >15% from cost with no corresponding weight
   increase in the live model portfolio (label `EXTENDED`); individual stocks above
   consensus PT by >10%; any downgrade in the past 14 days; **any upgrade in the past
@@ -357,9 +396,17 @@ Concretely, today's evaluation **must**:
 - Cover every section listed in the template, in the template's order. Skipping a section
   is a Reviewer-defect; reordering is a Reviewer-defect; expanding a section with the
   reasoning that belongs in another is a Reviewer-defect.
-- Use the **Action summary's tight 3-col table** (`Ticker | Px / Value | Signal`) and put
-  reasoning in the **Notes** block *below the table* — the per-name gate card with
+- Use the **Action summary's tight 4-col table** (`Ticker | Px / Value | Signal | 🐋 Darkpool`)
+  and put reasoning in the **Notes** block *below the table* — the per-name gate card with
   `GATE: S/E x/x` prefix lives in Notes, not in the cell.
+- **Fill the `🐋 Darkpool` cell on every row, last.** Copy it verbatim from the `### Book`
+  table in `output/data/darkpool_<date>.md`, which is keyed by the same roster ticker your
+  row uses. Do not re-derive it from the `### By ticker` table — that one is keyed by US
+  ticker and getting from a `.L` line to its row takes a second lookup into the twin table,
+  which is precisely the step this column was built to stop you doing by hand.
+  **Never leave it blank, and never write `—` unless the leg is ABSENT.** The seven states
+  are in the template and each one means something different; `` `THIN` `` and
+  `` `no twin` `` mean *checked*, `` `unseen` `` means the capture had no row.
 - Carry a **`## Held positions (summary)`** table immediately after the Action summary's Notes,
   with 4 short columns (`Ticker | Px | Sector | Stop / Trigger`). Reasoning lives in the
   Notes above; the column is the level. **A missing row here = a missing coverage call.**

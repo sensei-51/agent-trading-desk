@@ -29,7 +29,9 @@ concentration.
 Checks
   --pre      providers on disk satisfy the contract, captures are inside their
              declared max age, provider config resolves; sector-map hygiene
-             (duplicate rows; bare/.L collisions; HELD names with no row)
+             (duplicate rows; bare/.L collisions; HELD names with no row —
+             a warning naming the fix, halting only when the unplaced value
+             could hide a bloc breach)
   --post     ticker identity (every held line's fetched currency matches its
              broker row — see check_ticker_identity),
              bloc ceiling ≤ 25% NAV per sector (warn ≥ 90% of cap),
@@ -108,6 +110,7 @@ def load_holdings():
     """
     files, _ = hr.discover_holdings_files()
     smap = hr.load_sector_map()
+    usec = hr.load_universe_sectors(smap)
     rows, unreadable = [], []
     for path in files:
         data = hr.read_csv_rows(path)
@@ -115,18 +118,19 @@ def load_holdings():
             continue
         heads = list(data[0].keys())
         tkcol = hr.pick_column(heads, hr.TICKER_HEADERS)
+        ncol = hr.pick_column(heads, hr.NAME_HEADERS)
         vcol, native = hr.find_sterling_column(heads)
         if not tkcol or not vcol:
             unreadable.append(os.path.basename(path))
             continue
         for row in data:
-            sym = (row.get(tkcol) or "").strip().upper()
+            sym = hr.row_symbol(row, tkcol, ncol)
             if not sym:
-                continue  # cash lines carry a value and no ticker
+                continue  # the "Totals" / currency-split rows
             val, sterling = hr.parse_pounds(row.get(vcol))
             if val is None or not sterling:
                 continue
-            sec = hr.map_sector(sym, smap) or "Unclassified"
+            sec = hr.map_sector(sym, smap, usec) or "Unclassified"
             rows.append((sym, val, sec))
     return rows, sum(v for _, v, _ in rows), unreadable
 
@@ -260,12 +264,62 @@ def check_brokers_readable():
 
 
 def check_held_classified():
-    rows, _, _ = load_holdings()
+    """An unmapped HELD name warns and names the fix; it halts only when the
+    missing rows could be hiding a bloc breach.
+
+    UNTIL 2026-09-01 this was an unconditional ⛔. On that day `CF` — bought the
+    day before, £3,624, its classification never in doubt — halted run_daily at
+    step 0 and nothing downstream ran, for a one-line edit. Buying a name before
+    writing its map row is the normal order of events, so the trigger repeats
+    every time a position is opened (backlog #30).
+
+    The understatement is real and still worth reporting: an Unclassified line
+    is missing from its sector's weight, so a bloc can read under the ceiling
+    while actually being over it. But that is the ONLY part worth halting for,
+    and it is testable — put every unplaced pound in the largest bloc and see
+    whether the ceiling breaks. If even that worst case stays under, no decision
+    this run can turn on the missing rows, and a WARN naming them is the honest
+    report. sector_map.md's own header has documented Unclassified as "reported
+    as a warning on every run" since the file was created; this makes the check
+    agree with it.
+
+    Deliberately NOT auto-classified. `input/` is the human's, and a
+    confident-looking guess filed under the wrong sector is worse than either a
+    halt or a warning — the failure item 23 already demonstrated.
+    """
+    rows, total, _ = load_holdings()
     missing = sorted({s for s, _, sec in rows if sec == "Unclassified"})
-    if missing:
-        return FAIL, ("HELD with no sector_map row (weights understated): "
-                      + ", ".join(missing))
-    return OK, f"all {len(rows)} held names classified"
+    if not missing:
+        return OK, f"all {len(rows)} held names classified"
+
+    unplaced = sum(v for _, v, sec in rows if sec == "Unclassified")
+    by_sec = {}
+    for _, v, sec in rows:
+        if sec in CASH_SECTORS or sec == "Unclassified":
+            continue
+        by_sec[sec] = by_sec.get(sec, 0) + v
+    # The worst case is every unplaced pound landing in the largest bloc that is
+    # STILL UNDER the ceiling — plus the empty bloc, for a name whose sector is
+    # not in the book yet. A bloc already over the cap is excluded on purpose:
+    # check_bloc_ceiling is failing on it out loud whatever these rows say, so
+    # it is not a breach the missing rows could be concealing.
+    cap = total * BLOC_CAP_PCT / 100
+    worst = max([v for v in by_sec.values() if v <= cap] + [0.0]) + unplaced
+    pct = worst / total * 100 if total else 0.0
+
+    fix = ("FIX: add a `| TICKER | Sector |` row per name to "
+           "input/tracking/sector_map.md")
+    named = ", ".join(missing)
+    if pct > BLOC_CAP_PCT:
+        return FAIL, (f"HELD with no sector_map row: {named}. £{unplaced:,.0f} "
+                      f"unplaced could put a bloc past the {BLOC_CAP_PCT:.0f}% "
+                      f"ceiling ({pct:.1f}% worst case), so the concentration "
+                      f"rails cannot be trusted until it is classified. " + fix)
+    return WARN, (f"HELD with no sector_map row: {named}. £{unplaced:,.0f} "
+                  f"unplaced — its sector's weight is understated, but no bloc "
+                  f"can reach the {BLOC_CAP_PCT:.0f}% ceiling even if all of it "
+                  f"lands there ({pct:.1f}% worst case), so the run continues. "
+                  + fix)
 
 
 def check_providers_discover():

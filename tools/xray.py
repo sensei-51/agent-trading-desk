@@ -89,6 +89,7 @@ def load_rows():
     """[(symbol, value_gbp, sector, currency)] from every real holdings CSV."""
     files, demo = hr.discover_holdings_files()
     smap = hr.load_sector_map()
+    usec = hr.load_universe_sectors(smap)
     out, unconverted, no_sector, detections = [], [], [], []
 
     for path in files:
@@ -103,6 +104,7 @@ def load_rows():
             detections.append((base, "no ticker column"))
             continue
         qcol = hr.pick_column(heads, QTY_HEADERS)
+        ncol = hr.pick_column(heads, hr.NAME_HEADERS)
         vcol, native = hr.find_sterling_column(heads)
         if not vcol:
             detections.append((base, f"no market-value column ({len(rows)} rows, skipped)"))
@@ -110,7 +112,7 @@ def load_rows():
         detections.append((base, f"value={vcol!r}" + (" (native, unconverted)" if native else "")))
 
         for row in rows:
-            sym = (row.get(tkcol) or "").strip().upper()
+            sym = hr.row_symbol(row, tkcol, ncol)
             if not sym:
                 continue  # the "Totals" / currency-split rows
             val, conv = hr.parse_pounds(row.get(vcol))
@@ -119,7 +121,7 @@ def load_rows():
             if not conv:
                 unconverted.append((sym, row.get(vcol)))
                 continue
-            sec = hr.map_sector(sym, smap)
+            sec = hr.map_sector(sym, smap, usec)
             if not sec:
                 no_sector.append(sym)
             out.append((sym, val, sec or "Unclassified", base, parse_qty(
@@ -468,8 +470,6 @@ def main():
                     help="do not append to nav_history.json (report only)")
     ap.add_argument("--check-history", action="store_true",
                     help="verify nav_history.json parses and matches today; exit 1 if not")
-    ap.add_argument("--allow-unclassified", action="store_true",
-                    help="do not exit non-zero when a HELD name has no sector_map row")
     a = ap.parse_args()
 
     rows, unconverted, no_sector, detections, demo = load_rows()
@@ -560,10 +560,14 @@ def main():
     print(f"Wrote {md_path}")
     print(f"  NAV £{total:,.0f} · {len(rows)} holdings · top: {top}"
           + (f" · export dated {data_date}" if data_date else ""))
-    if no_sector and not a.allow_unclassified:
-        # A held name with no sector row is bad input, not a cosmetic gap —
-        # fail the step so run_daily halts instead of shipping a wrong table.
-        return 2
+    # An unmapped HELD name is still bad input, and the ⛔ banner above says so
+    # inside the report where anyone reading the weights will see it. It no
+    # longer fails the STEP: whether it is bad enough to halt the run is one
+    # decision, and since 2026-09-01 it belongs to check_held_classified in
+    # tools/checks.py, which halts only when the unplaced value could hide a
+    # bloc breach (backlog #30). Gating here too meant the run died at step 2
+    # for a one-line map edit even after checks-pre had cleared it, and made a
+    # single rule live in two scripts — the shape item 10 is about.
     return 0
 
 
