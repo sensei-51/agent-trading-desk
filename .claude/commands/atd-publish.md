@@ -145,22 +145,33 @@ An empty `output/` in the published tree is **correct**, not a defect. The
 audit claim is carried by the README track record, which is generated from the
 same ledger and cannot disclose a size.
 
-## 6 — The leak sweep, inside the published tree
+## 6 — The leak sweep, over the published tree
 
 ```bash
-cd <dst> && python3 tools/checks.py --publish
+python3 tools/checks.py --publish --tree <dst>
 ```
 
-**Inside `<dst>`, never in the private tree** — run here it reports the private
-tree's own private providers and tells you to publish first, which is correct
-and not the check you wanted.
+**From the private tree, pointed at `<dst>`.** This is the opposite of the rule
+that stood here until 2026-09-01, and the change is the point. The sweep needs
+both books at once — the private one to know what the real figures are, the
+published one to prove they are absent — and the old invocation (`cd <dst> &&
+checks.py --publish`) gave it only the published one. There it found the demo
+book, had no needle to search for, and returned `⚪ SKIP` on every publish this
+repo has ever done. The gate this step leans on had never once fired. Running it
+in the private tree without `--tree` is still wrong and still refused; `--tree`
+is what makes the private tree the right place to stand.
 
-Two gates run: no provider declaring `private: True` is discoverable, and no
-real-NAV string appears anywhere in the tree. Any `⛔ FAIL` → **HALT** and quote
-it. A real-NAV hit means a size reached the published tree — most likely through
-the README block, since under the allow-list nothing else carries book figures
-at all. Treat it as a defect in `tools/scorecard.py`'s guard, not as a file to
-delete.
+Two gates run: no provider declaring `private: True` exists in `<dst>`, and no
+real figure from the private book appears anywhere in it. The needles are the
+NAV, every historical NAV, the 5% line caps and **every position value in the
+broker CSVs** — the 2026-09-01 leak was a single cash line, not the NAV, so a
+sweep that knew only totals would have walked past it.
+
+Any `⛔ FAIL` → **HALT** and quote it. A hit means a size reached the published
+tree. Fix the source in the private tree and re-publish; never delete the file
+from `<dst>` to clear the gate. Expect a line naming how many figures were swept
+— `⚪ SKIP` here now means the check could not run, not that it passed, and is
+itself worth stopping on.
 
 ## 7 — Stage the commit
 
@@ -186,9 +197,20 @@ should have made every one of those impossible, so a sighting means the boundary
 itself is broken.
 
 `input/tracking/universe.example.md` and `input/tracking/sector_map.md` **do**
-ship and are not a halt. Both name public instruments only; `sector_map.md` is
-required for a clone to run its own checks, and `universe.example.md` is a nine-name
-starter list written for this purpose, not a record of anybody's research.
+ship and are not a halt, but they get there by different routes.
+`universe.example.md` is a starter list written for this purpose, copied as-is.
+
+`sector_map.md` is **generated** (2026-09-01), not copied — it left the allow-list
+the day it was noticed that shipping it whole publishes the roster. Every held name
+must be classified there or `check_held_classified` fails, so the file tracks the
+book by construction; and its Note column is free text, which on 27 Aug 2026 came
+to read "added 27 Aug 2026 when CMX1 entered the book" — a position and its entry
+date, in a file no gate reads for prose. `write_public_sector_map()` now derives
+the published copy: the ticker table filtered to the demo book and starter list,
+the Investable line column set to `none` throughout, and the header authored by the
+generator so private free text cannot reach it by default. Step 5 prints how many
+mappings were kept and how many withheld — a sudden jump in *kept* is worth a look,
+because it means the demo book or the starter list grew.
 
 The real `input/tracking/universe.md` **stopped shipping on 2026-08-25**, as did
 `sector-coverage.md`. Seeing either in the file list is therefore a HALT now, where
@@ -268,8 +290,13 @@ new evaluations, changed rules — one line each.
   the GitHub repo** — the human makes it themselves.
 - **Never edit the private tree.** This command reads from it and writes only to
   `<dst>`. If something here is wrong, say so and HALT.
-- **Never run `checks.py --publish` in the private tree** and report the result
-  as the gate. It is the wrong tree and the answer is meaningless.
+- **Never run `checks.py --publish` without `--tree`** and report the result as
+  the gate. Bare, it is the wrong tree either way: in the private tree it FAILs
+  on the private providers sitting there, and in the published tree it skips the
+  real-NAV arm entirely. Only `--tree <dst>`, run from the private tree, gives
+  the check both halves of what it needs.
+- **Never treat a `⚪ SKIP` on the leak sweep as a pass.** It means the sweep had
+  no figures to look for — the reason it was silently useless until 2026-09-01.
 - **Never work around a failed gate** by hand-deleting the offending file from
   the published tree. The gate found a hole in `publish.py`; patch that instead.
 - **Never pass `--regen`,** and never copy `output/` by hand. Evaluations, the

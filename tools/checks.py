@@ -44,9 +44,14 @@ Checks
              input/ and output/.state/; gitignore sanity (no inline comment
              after a negation; node_modules covered)
 
+             Pass --tree <published dir> and run this FROM THE PRIVATE TREE.
+             The sweep needs the real book to know what to look for and the
+             published tree to look in; only that invocation has both. Without
+             it the real-NAV arm cannot fire and says so.
+
 Usage    python3 tools/checks.py --pre
          python3 tools/checks.py --post
-         python3 tools/checks.py --publish
+         python3 tools/checks.py --publish --tree ../trading-portfolio-public
          python3 tools/checks.py            # pre + post
 
 Standard library only. Exit 0 = all OK/WARN, 1 = at least one FAIL.
@@ -68,6 +73,22 @@ import heartbeat_radar as hr  # noqa: E402 — path set above
 import providers              # noqa: E402
 
 INPUT_DIR = os.environ.get("TP_INPUT", os.path.join(ROOT, "input"))
+
+# The tree the PUBLISH suite inspects. Defaults to ROOT, which is the historical
+# behaviour: cd into the published tree and run --publish there.
+#
+# `--tree <dir>` splits the two roles this suite has always conflated. The leak
+# sweep needs a real NAV to build needles from and a published tree to search
+# for them in, and those are never the same tree — the published one is the one
+# the figure must be absent from, so by construction it cannot supply it. Run
+# inside the published tree the sweep found a demo book, had no needle to look
+# for, and skipped; run in the private tree it FAILs on the private providers
+# sitting right there. Neither invocation could ever fire the check, which is
+# why it read ⚪ SKIP on every publish for as long as it has existed.
+#
+# With --tree, needles come from ROOT (private, has the book) and the walk runs
+# over TREE (published, must be clean). See check_publish_leaks.
+TREE = ROOT
 OUTPUT_DIR = os.environ.get("TP_OUTPUT", os.path.join(ROOT, "output"))
 
 BLOC_CAP_PCT = 25.0        # per-sector ceiling, % NAV (CONFIG §2)
@@ -400,19 +421,40 @@ def check_no_private_providers():
     declaration cannot be talked around. The vendor-name sweep below is kept as
     a backstop for prose, in that order of trust.
     """
-    priv = providers.private_providers()
-    cap = os.path.join(INPUT_DIR, "capture")
+    if TREE == ROOT:
+        priv = [p.path for p in providers.private_providers()]
+        cap = os.path.join(INPUT_DIR, "capture")
+    else:
+        # Scanning a tree we are not running inside: read the declarations off
+        # disk rather than importing them. Still structural — it reads the
+        # `"private": True` declaration, not a vendor name — but it does not
+        # require the target tree to be importable from this interpreter.
+        priv = []
+        for dp, dn, fns in os.walk(os.path.join(TREE, "providers")):
+            dn[:] = [d for d in dn if d != "__pycache__"]
+            for fn in fns:
+                if not fn.endswith(".py"):
+                    continue
+                fp = os.path.join(dp, fn)
+                try:
+                    body = open(fp, encoding="utf-8", errors="ignore").read()
+                except OSError:
+                    continue
+                if re.search(r'["\']private["\']\s*:\s*True', body):
+                    priv.append(os.path.relpath(fp, TREE))
+        cap = os.path.join(TREE, "input", "capture")
     cap_files = [f for f in (os.listdir(cap) if os.path.isdir(cap) else [])
                  if not f.startswith(".")]
     if priv or cap_files:
         bits = []
         if priv:
-            bits.append("private provider(s): " + ", ".join(p.path for p in priv))
+            bits.append("private provider(s): " + ", ".join(sorted(priv)))
         if cap_files:
             bits.append(f"{len(cap_files)} capture file(s) in input/capture/")
-        return FAIL, ("; ".join(bits) + " — this tree is the PRIVATE one. "
+        where = "this tree" if TREE == ROOT else TREE
+        return FAIL, ("; ".join(bits) + f" — {where} is the PRIVATE one. "
                       "Publish with `python3 tools/publish.py --to <dir>`, which "
-                      "excludes both, and run --publish inside that tree.")
+                      "excludes both, and sweep that tree with --tree.")
     return OK, "no private providers and no capture data present"
 
 
@@ -768,60 +810,138 @@ def check_ledger_touched():
 
 # ---------------------------------------------------------------- publish sweep
 
-def check_publish_leaks():
+def _leak_needles():
+    """Real figures from the PRIVATE book, as strings a document might quote.
+
+    Deliberately NOT imported from tools/publish.py, which builds an equivalent
+    set. publish.py is in its own DENY list and never ships, so a public clone
+    could not import it; and this check exists to be the second opinion on that
+    build. A backstop that calls the thing it backstops is not a backstop —
+    the same reasoning the `.rerun` note below records.
+    """
+    needles = {}
+
+    def add(raw, why):
+        txt = str(raw).strip().strip('"')
+        try:
+            val = float(txt.replace(",", ""))
+        except ValueError:
+            return
+        # Under £1,000 is a share price, not a size. Exact multiples of 500 are
+        # the worked examples the rules quote on nearly every page — the
+        # £100,000 nominal sleeve, the £5,000 cap. Real book figures land on
+        # arbitrary numbers, and a gate that fires on a worked example is a gate
+        # nobody reads. Years are excluded because every docstring here is dated.
+        if val < 1000 or val % 500 == 0:
+            return
+        for form in {txt, txt.replace(",", ""), f"{val:,.0f}",
+                     f"{val:,.2f}", f"{val:.0f}"}:
+            if re.fullmatch(r"20\d\d", form) or len(form) < 4:
+                continue
+            needles.setdefault(form, why)
+
     _, total, _ = load_holdings()
-    demo = hr.discover_holdings_files()[1]
-    if not total:
-        return SKIP, "no holdings to derive leak strings from"
-    # A demo book has no real NAV to leak, and its total is £100,000 — the nominal
-    # sleeve CONFIG.md, DISCLAIMER.md and the rules files quote on nearly every
-    # page. Sweeping for it reports every one of those as a breach. This is the
-    # same reasoning `_add_needle` in tools/publish.py applies to round figures:
-    # a worked example is not a secret, and a gate that fires on one is a gate
-    # nobody reads. The discriminator is the roster itself, not the number —
-    # raise the nominal to £250,000 and this still holds.
-    if demo:
-        return SKIP, "running on the demo book — no real NAV to sweep for"
-    needles = {f"{total:,.0f}", f"{total:,.2f}", f"{total:.0f}"}
-    # `.rerun` is skipped in the PRIVATE tree only (2026-08-23). Sandboxes there
-    # are gitignored copies of `output/` and carry the real NAV by design, so
-    # sweeping them reports a leak that is not one. In a published tree the same
-    # skip is a blind spot: a `.rerun/` that got copied is exactly what this
-    # sweep exists to catch, and it would pass unread. tools/publish.py now
-    # excludes `.rerun/` and fails its own post-conditions if one appears —
-    # this is the independent second opinion on that, and a backstop that trusts
-    # the thing it backstops is not a backstop. The discriminator is the same one
-    # check_no_private_providers() uses: a tree with private providers on disk is
-    # the private one, and `--publish` there already FAILs on that check.
-    skip_dirs = {".git", "node_modules", ".state", "__pycache__", "input",
+    if total:
+        add(total, "today's NAV")
+    # HISTORICAL NAVs too. Needles from today's export catch only today's
+    # figure, and the leak this gate was rewritten for was a docstring quoting a
+    # cash balance from a run that had already rolled over.
+    nav = os.path.join(ROOT, "output", ".state", "nav_history.json")
+    if os.path.exists(nav):
+        try:
+            with open(nav, encoding="utf-8") as fh:
+                for pt in (json.load(fh).get("history") or []):
+                    add(pt.get("nav_gbp", ""), "NAV history")
+                    try:
+                        add(round(float(pt["nav_gbp"]) * 0.05, 2),
+                            "NAV history (5% line cap)")
+                    except (KeyError, TypeError, ValueError):
+                        pass
+        except (OSError, ValueError):
+            pass
+    # Every position value in the book, not just the total. The figure that
+    # reached engine/heartbeat_radar.py on 2026-09-01 was a single cash line,
+    # not the NAV, and a needle set holding only totals would have walked past
+    # it. publish.py caught it because it sweeps broker cells; this now does too.
+    # (The figure is deliberately not quoted here — this file ships, and a
+    # comment naming a real balance is the leak, whatever it is explaining.)
+    for src in glob.glob(os.path.join(ROOT, "input", "*.csv")):
+        if src.endswith(".example.csv"):
+            continue
+        try:
+            with open(src, encoding="utf-8-sig") as fh:
+                import csv as _csv
+                for row in _csv.DictReader(fh):
+                    for k, v in row.items():
+                        if not k or not v:
+                            continue
+                        if any(w in k.lower() for w in
+                               ("quantity", "qty", "value", "cost")):
+                            add(v, os.path.basename(src))
+        except (OSError, ValueError):
+            continue
+    return needles
+
+
+def check_publish_leaks():
+    """PUBLISH GATE. No real book figure may appear in the published tree.
+
+    Run this from the PRIVATE tree with `--tree <published dir>`. The check
+    needs both books at once — the private one to know what the figures are,
+    the published one to prove they are absent — and until 2026-09-01 it was
+    only ever given one. Inside the published tree it found the demo book, had
+    nothing to search for and returned ⚪ SKIP; in the private tree the private
+    providers sitting on disk FAIL the check before this one. The gate the
+    publish contract leaned on had therefore never fired, on any run.
+    """
+    if TREE == ROOT:
+        return SKIP, ("no published tree to sweep — run this from the private "
+                      "tree as `--publish --tree <published dir>`; inside the "
+                      "published tree there is no real NAV to sweep for")
+    if not os.path.isdir(TREE):
+        return FAIL, f"--tree {TREE} does not exist"
+    needles = _leak_needles()
+    if not needles:
+        return SKIP, ("no real figures to sweep for — the private tree is a "
+                      "demo book, or its broker CSVs are unreadable")
+    # `.rerun` sandboxes in the PRIVATE tree are gitignored copies of `output/`
+    # and carry the real NAV by design. In a PUBLISHED tree a `.rerun/` that got
+    # copied is exactly what this sweep exists to catch, so it is walked here.
+    skip_dirs = {".git", "node_modules", ".state", "__pycache__",
                  "_to_delete", ".venv", "venv"}
-    if providers.private_providers():
-        skip_dirs.add(".rerun")
-    hits = []
-    for dirpath, dirnames, filenames in os.walk(ROOT):
+    hits = {}
+    for dirpath, dirnames, filenames in os.walk(TREE):
         dirnames[:] = [d for d in dirnames if d not in skip_dirs]
         for fn in filenames:
-            if not fn.endswith((".md", ".csv", ".json", ".txt")):
+            if not fn.endswith((".md", ".csv", ".json", ".txt", ".py",
+                                ".example")):
                 continue
-            p = os.path.join(dirpath, fn)
+            fp = os.path.join(dirpath, fn)
             try:
-                body = open(p, encoding="utf-8", errors="ignore").read()
+                body = open(fp, encoding="utf-8", errors="ignore").read()
             except OSError:
                 continue
-            for n in needles:
+            for n, why in needles.items():
                 if n in body:
-                    hits.append(os.path.relpath(p, ROOT))
+                    hits.setdefault(os.path.relpath(fp, TREE), why)
                     break
     if hits:
-        return FAIL, (f"real NAV (£{total:,.0f}) appears outside input/ in: "
-                      + ", ".join(sorted(set(hits))[:12])
-                      + (" …" if len(set(hits)) > 12 else "")
-                      + " — regenerate output/ from anonymised holdings before pushing")
-    return OK, "no real-NAV strings outside input/ and .state/"
+        # The figure itself is NOT printed. This message is the one part of the
+        # gate that gets pasted into a terminal, an issue or a transcript, and a
+        # leak report that quotes the leak has moved it somewhere new.
+        return FAIL, (f"{len(hits)} file(s) in the published tree carry a real "
+                      "book figure: "
+                      + ", ".join(f"{f} (matches {w})"
+                                  for f, w in sorted(hits.items())[:12])
+                      + (" …" if len(hits) > 12 else "")
+                      + " — fix the source in the private tree and re-publish; "
+                        "do not delete from the published tree")
+    return OK, (f"{len(needles)} real figure(s) swept, none present in "
+                + os.path.basename(TREE.rstrip("/")))
 
 
 def check_gitignore_sanity():
-    path = os.path.join(ROOT, ".gitignore")
+    path = os.path.join(TREE, ".gitignore")
     if not os.path.exists(path):
         return FAIL, "no .gitignore"
     lines = open(path, encoding="utf-8").read().splitlines()
@@ -913,9 +1033,22 @@ def main():
     ap.add_argument("--pre", action="store_true")
     ap.add_argument("--post", action="store_true")
     ap.add_argument("--publish", action="store_true")
+    ap.add_argument("--tree", metavar="DIR", default=None,
+                    help="published tree to sweep; run from the private tree")
     a = ap.parse_args()
     suites = [k for k, on in (("pre", a.pre), ("post", a.post),
                               ("publish", a.publish)) if on] or ["pre", "post"]
+    if a.tree:
+        if not a.publish:
+            ap.error("--tree is only meaningful with --publish")
+        global TREE
+        TREE = os.path.abspath(os.path.expanduser(a.tree))
+        if not os.path.isdir(TREE):
+            ap.error(f"--tree {TREE} is not a directory")
+        if os.path.abspath(TREE) == os.path.abspath(ROOT):
+            ap.error("--tree points at the private tree itself — pass the "
+                     "published tree that tools/publish.py wrote")
+        print(f"[checks] sweeping published tree: {TREE}")
 
     failed = 0
     for suite in suites:
