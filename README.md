@@ -402,7 +402,7 @@ Both directions are overridable — `--input-dir` / `--output-dir`, or the `TP_I
 
 ## What this is not
 
-- **Not backtested.** These are process rules derived from post-mortems, not a validated statistical edge. The ledger exists precisely because nothing here has been proven.
+- **Components standard; this assembly untested.** The primitives — trend filter, volume confirmation, consolidation base, earnings acceleration — are a widely-taught momentum/breakout framework with substantial published evidence behind the underlying factors (see the provenance note in [`rules/01_METHOD.md`](rules/01_METHOD.md)). What has *not* been tested is this implementation: the volatility-adjusted coil that replaced the taught fixed-range version, the local constants, the ETF gate card written here because the stock card cannot score a fund, and the amendments made after single missed trades. Those are the parts most likely to be wrong — and the mechanical ones are replayable against the two-year bar cache. What can never be backtested is the judgement half: an agent reading prose is not a function you can replay, which is why the ledger exists.
 - **Not automated trading.** Nothing places orders. Every output is a recommendation for a human to act on or ignore.
 - **Not tax- or jurisdiction-aware.** Currency handling assumes a sterling base with USD positions; adapt it.
 - **Not a stock picker.** It tells you *whether and how much*, never *what to believe*.

@@ -17,6 +17,11 @@ tracks a live book will otherwise disclose that book:
   roster, so `none` is not a redaction here — it is the accurate value, and it
   carries the meaning the column already defines: finding a vehicle becomes that
   run's EXPANSION task.
+- **The bellwether table is filtered to sectors the shipped tickers reach.** A
+  gauge row for a sector with no members is not usable method; it is a taxonomy,
+  and a taxonomy that tracks a live book discloses that book's shape even with
+  every ticker stripped out of it. Add names in your own sectors and add their
+  gauges here — the four-column shape is what `load_bellwethers()` requires.
 
 **Resolution order:** this file → the `Sector` column in `input/tracking/*.md` →
 `Unclassified` (reported as a warning on every run).
@@ -46,28 +51,14 @@ One reference ETF per sector. **Measurement-only rules:**
 
 | Sector | Bellwether | Investable line | Note |
 |---|---|---|---|
-| AIInfra | DTCR | none | Global X Data Center & Digital Infra — REIT-tilted, approximate for the E&C/power names |
-| Agri | MOO | none | VanEck Agribusiness |
-| CleanEnergy | ICLN | none | iShares Global Clean Energy; TAN if solar-only read needed |
-| Consumer | XLY | none | Consumer Discretionary Select SPDR |
 | Defence | ITA | none | iShares US Aerospace & Defense; SHLD = defence-tech tilt |
-| Defensive | XLP | none | Consumer Staples Select SPDR |
 | Energy | XLE | none | Energy Select SPDR; OIH for the services leg |
 | Financials | XLF | none | Matches the the strategic-conviction model XLF signal directly |
 | Gold | GDX + GLD | none | Miners + metal, per `input/tracking/universe.md` |
-| GrowthSW | IGV | none | iShares Expanded Tech-Software |
-| Healthcare | XLV | none | Health Care Select SPDR |
 | Index | — | none | Indices are their own bellwethers |
-| Japan | EWJ | none | iShares MSCI Japan |
 | Materials | XLB | none | Broad; REMX closer for critical metals |
-| Mexico | EWW | none |  |
 | MegaTech | MAGS | none | Roundhill Magnificent Seven |
-| Quantum | QTUM | none | Defiance Quantum & Machine Learning |
-| Rail | IYT | none | Transports proxy |
 | Semis | SMH | none | VanEck Semiconductor |
-| Shipping | BOAT | none | SonicShares Global Shipping |
-| Uranium | URA | none | Global X Uranium |
-| Utility | XLU | none | Utilities Select SPDR |
 
 *Note on dual keys: a bare ticker and its `.L`-suffixed form may both appear —
 this is a lookup map keyed by ticker string, and duplicate keys cannot
